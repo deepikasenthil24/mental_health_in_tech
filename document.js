@@ -1,22 +1,40 @@
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOMContentLoaded event triggered');
     const xAxisSelect = document.getElementById('x-axis-select');
     const yAxisSelect = document.getElementById('y-axis-select');
 
-    d3.csv('survey_2014-2019.csv').then(data => {
+    // CSV data (replace this with your actual CSV data)
+    const csvData = `year,self_employed,number_of_employees,tech_company,mental_health_benefits,mental_health_benefits_awareness,employer_mental_health_discussion,employer_mental_health_learning_resources,mental_health_treatment_anonymity,mental_health_leave_accessibility,mental_health_discussion_comfort_coworkers,mental_health_discussion_comfort_supervisor
+    2014,No,100-500,Yes,Yes,Yes,No,No,No,Somewhat difficult,Some of them,Some of them
+    2014,No,26-100,Yes,Yes,Yes,No,No,Don't know,Don't know,Some of them,Yes`;
+
+    // Convert CSV data to Base64
+    const base64Data = btoa(csvData);
+
+    // Construct the data URL
+    const dataURL = `data:text/csv;base64,${base64Data}`;
+
+    // Use the constructed data URL to fetch CSV data
+    d3.csv(dataURL).then(data => {
+        console.log('CSV data loaded:', data);
         const columns = Object.keys(data[0]);
+        console.log('Column names:', columns);
 
         // Populate the select options
         columns.forEach(column => {
+            console.log('Adding option for column:', column);
             const optionX = document.createElement('option');
             optionX.value = column;
             optionX.text = column;
-            xAxisSelect.add(optionX);
+            xAxisSelect.appendChild(optionX);
 
             const optionY = document.createElement('option');
             optionY.value = column;
             optionY.text = column;
-            yAxisSelect.add(optionY);
+            yAxisSelect.appendChild(optionY);
         });
+
+        console.log('Dropdowns populated');
 
         // Initial chart draw
         drawChart(data, columns[0], columns[1]);
@@ -24,13 +42,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('update-chart').addEventListener('click', () => {
             const selectedX = xAxisSelect.value;
             const selectedY = yAxisSelect.value;
+            console.log('Update button clicked. Selected X:', selectedX, 'Selected Y:', selectedY);
             drawChart(data, selectedX, selectedY);
         });
     }).catch(error => {
-        console.error('Error loading the CSV file:', error);
+        console.error('Error loading the CSV data:', error);
     });
+    
 
     function drawChart(data, xColumn, yColumn) {
+        console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
         // Clear the existing chart
         d3.select('#chart').selectAll('*').remove();
 
@@ -44,13 +65,14 @@ document.addEventListener('DOMContentLoaded', function () {
             .append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
 
-        const parseTime = d3.timeParse('%Y-%m-%d');
+        // Determine data types for x and y columns
+        const isDateX = xColumn === 'year'; // Assuming 'year' is the date column
+        const isDateY = false; // Assuming y-axis columns are not dates
 
-        // Determine if xColumn is a date
-        const isDate = !isNaN(Date.parse(data[0][xColumn]));
+        const parseTime = isDateX ? d3.timeParse('%Y') : null;
 
         data.forEach(d => {
-            if (isDate) {
+            if (isDateX) {
                 d[xColumn] = parseTime(d[xColumn]);
             } else {
                 d[xColumn] = +d[xColumn];
@@ -58,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
             d[yColumn] = +d[yColumn]; // convert yColumn to number
         });
 
-        const x = isDate ? d3.scaleTime().range([0, width]) : d3.scaleLinear().range([0, width]);
+        const x = isDateX ? d3.scaleTime().range([0, width]) : d3.scaleLinear().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
 
         const line = d3.line()
