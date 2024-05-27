@@ -3,22 +3,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const xAxisSelect = document.getElementById('x-axis-select');
     const yAxisSelect = document.getElementById('y-axis-select');
 
-    const csvData = `year,response,mentalhealthcarecoverage
-2014,Yes,0.414161
-2014,No,0.246363
-2014,Don't Know,0.339476
-2016,Yes,0.499529
-2016,No,0.200754
-2016,Don't Know,0.299717
-2017,Yes,0.581848
-2017,No,0.147488
-2017,Don't Know,0.270665
-2018,Yes,0.626471
-2018,No,0.123529
-2018,Don't Know,0.250000
-2019,Yes,0.573427
-2019,No,0.122378
-2019,Don't Know,0.304196`;
+    const csvData = `year,response,mentalhealthcarecoverage,awarenessOfOptions
+2014,Yes,0.414161,0.338506
+2014,No,0.246363,0.406402
+2014,Don't Know,0.339476,0.255092
+2016,Yes,0.499529,0.267483
+2016,No,0.200754,0.308566
+2016,Don't Know,0.299717,0.307692
+2017,Yes,0.581848,0.416796
+2017,No,0.147488,0.479005
+2017,Don't Know,0.270665,0.000000
+2018,Yes,0.626471,0.454294
+2018,No,0.123529,0.443213
+2018,Don't Know,0.250000,0.000000
+2019,Yes,0.573427,0.427632
+2019,No,0.122378,0.486842
+2019,Don't Know,0.304196,0.000000`;
 
     // Convert CSV data to Base64
     const base64Data = btoa(csvData);
@@ -26,30 +26,35 @@ document.addEventListener('DOMContentLoaded', function () {
     // Construct the data URL
     const dataURL = `data:text/csv;base64,${base64Data}`;
 
+    // Populate the select options
+    function populateSelectOptions() {
+        const xOptions = ['year'];
+        const yOptions = ['mentalhealthcarecoverage', 'awarenessOfOptions'];
+
+        xOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.text = option;
+            xAxisSelect.appendChild(optionElement);
+        });
+
+        yOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.text = option;
+            yAxisSelect.appendChild(optionElement);
+        });
+    }
+
+    // Populate the select options initially
+    populateSelectOptions();
+
     // Use the constructed data URL to fetch CSV data
     d3.csv(dataURL).then(data => {
         console.log('CSV data loaded:', data);
-        const columns = Object.keys(data[0]);
-        console.log('Column names:', columns);
-
-        // Populate the select options
-        columns.forEach(column => {
-            console.log('Adding option for column:', column);
-            const optionX = document.createElement('option');
-            optionX.value = column;
-            optionX.text = column;
-            xAxisSelect.appendChild(optionX);
-
-            const optionY = document.createElement('option');
-            optionY.value = column;
-            optionY.text = column;
-            yAxisSelect.appendChild(optionY);
-        });
-
-        console.log('Dropdowns populated');
-
+        
         // Initial chart draw
-        drawChart(data, columns[0], columns[2]); // Default to x: year, y: mentalhealthcarecoverage
+        drawChart(data, 'year', 'mentalhealthcarecoverage');
 
         document.getElementById('update-chart').addEventListener('click', () => {
             const selectedX = xAxisSelect.value;
@@ -76,23 +81,18 @@ document.addEventListener('DOMContentLoaded', function () {
             .append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
 
-        // Determine data types for x and y columns
-        const isDateX = xColumn === 'year'; // Assuming 'year' is the date column
-
-        const parseTime = isDateX ? d3.timeParse('%Y') : null;
+        const parseTime = d3.timeParse('%Y');
 
         // Transform data
         data.forEach(d => {
-            if (isDateX) {
-                d[xColumn] = parseTime(d[xColumn]);
-            }
+            d[xColumn] = parseTime(d[xColumn]);
             d[yColumn] = +d[yColumn]; // convert yColumn to number
         });
 
         // Group data by response
         const groupedData = d3.group(data, d => d.response);
 
-        const x = isDateX ? d3.scaleTime().range([0, width]) : d3.scaleLinear().range([0, width]);
+        const x = d3.scaleTime().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
 
         const line = d3.line()
@@ -114,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Draw lines for each response category
         groupedData.forEach((values, key) => {
+            console.log(`Drawing line for ${key} with values:`, values);
             svg.append('path')
                 .data([values])
                 .attr('class', 'line')
@@ -121,6 +122,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 .style('fill', 'none')
                 .style('stroke', color(key))
                 .style('stroke-width', '2px');
+
+            // Add legend
+            svg.append("text")
+                .attr("transform", `translate(${width},${y(values[0][yColumn])})`)
+                .attr("dy", ".35em")
+                .attr("text-anchor", "start")
+                .style("fill", color(key))
+                .text(key);
         });
     }
 });
