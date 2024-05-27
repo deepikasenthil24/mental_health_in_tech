@@ -3,10 +3,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const xAxisSelect = document.getElementById('x-axis-select');
     const yAxisSelect = document.getElementById('y-axis-select');
 
-    // CSV data (replace this with your actual CSV data)
-    const csvData = `year,self_employed,number_of_employees,tech_company,mental_health_benefits,mental_health_benefits_awareness,employer_mental_health_discussion,employer_mental_health_learning_resources,mental_health_treatment_anonymity,mental_health_leave_accessibility,mental_health_discussion_comfort_coworkers,mental_health_discussion_comfort_supervisor
-    2014,No,100-500,Yes,Yes,Yes,No,No,No,Somewhat difficult,Some of them,Some of them
-    2014,No,26-100,Yes,Yes,Yes,No,No,Don't know,Don't know,Some of them,Yes`;
+    const csvData = `year,response,mentalhealthcarecoverage
+2014,Yes,0.414161
+2014,No,0.246363
+2014,Don't Know,0.339476
+2016,Yes,0.499529
+2016,No,0.200754
+2016,Don't Know,0.299717
+2017,Yes,0.581848
+2017,No,0.147488
+2017,Don't Know,0.270665
+2018,Yes,0.626471
+2018,No,0.123529
+2018,Don't Know,0.250000
+2019,Yes,0.573427
+2019,No,0.122378
+2019,Don't Know,0.304196`;
 
     // Convert CSV data to Base64
     const base64Data = btoa(csvData);
@@ -37,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Dropdowns populated');
 
         // Initial chart draw
-        drawChart(data, columns[0], columns[1]);
+        drawChart(data, columns[0], columns[2]); // Default to x: year, y: mentalhealthcarecoverage
 
         document.getElementById('update-chart').addEventListener('click', () => {
             const selectedX = xAxisSelect.value;
@@ -48,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }).catch(error => {
         console.error('Error loading the CSV data:', error);
     });
-    
 
     function drawChart(data, xColumn, yColumn) {
         console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
@@ -67,18 +78,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Determine data types for x and y columns
         const isDateX = xColumn === 'year'; // Assuming 'year' is the date column
-        const isDateY = false; // Assuming y-axis columns are not dates
 
         const parseTime = isDateX ? d3.timeParse('%Y') : null;
 
+        // Transform data
         data.forEach(d => {
             if (isDateX) {
                 d[xColumn] = parseTime(d[xColumn]);
-            } else {
-                d[xColumn] = +d[xColumn];
             }
             d[yColumn] = +d[yColumn]; // convert yColumn to number
         });
+
+        // Group data by response
+        const groupedData = d3.group(data, d => d.response);
 
         const x = isDateX ? d3.scaleTime().range([0, width]) : d3.scaleLinear().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
@@ -88,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .y(d => y(d[yColumn]));
 
         x.domain(d3.extent(data, d => d[xColumn]));
-        y.domain(d3.extent(data, d => d[yColumn]));
+        y.domain([0, d3.max(data, d => d[yColumn])]);
 
         svg.append('g')
             .attr('transform', `translate(0,${height})`)
@@ -97,12 +109,18 @@ document.addEventListener('DOMContentLoaded', function () {
         svg.append('g')
             .call(d3.axisLeft(y));
 
-        svg.append('path')
-            .data([data])
-            .attr('class', 'line')
-            .attr('d', line)
-            .style('fill', 'none')
-            .style('stroke', 'steelblue')
-            .style('stroke-width', '2px');
+        // Define color scale for different responses
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        // Draw lines for each response category
+        groupedData.forEach((values, key) => {
+            svg.append('path')
+                .data([values])
+                .attr('class', 'line')
+                .attr('d', line)
+                .style('fill', 'none')
+                .style('stroke', color(key))
+                .style('stroke-width', '2px');
+        });
     }
 });
