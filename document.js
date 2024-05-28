@@ -20,13 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
 "2019",No,0.122378,0.486842,0.578947,0.427632
 "2019",Don't Know,0.304196,0.000000,0.078947,0.236842`;
 
-    // Convert CSV data to Base64
     const base64Data = btoa(csvData);
 
-    // Construct the data URL
     const dataURL = `data:text/csv;base64,${base64Data}`;
 
-    // Populate the select options
     function populateSelectOptions() {
         const xOptions = ['year'];
         const yOptions = ['mentalhealthcarecoverage', 'awarenessOfOptions', 'empDisc', 'empRes'];
@@ -46,10 +43,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Populate the select options initially
     populateSelectOptions();
 
-    // Row conversion function to parse year as Date object
     const parseTime = d3.timeParse('%Y');
     function rowConverter(d) {
         return {
@@ -62,11 +57,9 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Use the constructed data URL to fetch CSV data
     d3.csv(dataURL, rowConverter).then(data => {
         console.log('CSV data loaded:', data);
         
-        // Initial chart draw
         drawChart(data, 'year', 'mentalhealthcarecoverage');
 
         document.getElementById('update-chart').addEventListener('click', () => {
@@ -81,10 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function drawChart(data, xColumn, yColumn) {
         console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
-        // Clear the existing chart
         d3.select('#chart').selectAll('*').remove();
 
-        const margin = { top: 20, right: 150, bottom: 60, left: 80 }; // Adjusted right margin for legend
+        const margin = { top: 20, right: 150, bottom: 60, left: 80 };
         const width = 960 - margin.left - margin.right;
         const height = 500 - margin.top - margin.bottom;
 
@@ -94,10 +86,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
 
-        // Check parsed data
         console.log('Transformed data:', data);
 
-        // Group data by response
         const groupedData = d3.group(data, d => d.response);
 
         const x = d3.scaleTime().range([0, width]);
@@ -113,14 +103,12 @@ document.addEventListener('DOMContentLoaded', function () {
         svg.append('g')
             .call(d3.axisLeft(y));
 
-        // Define color scale for different responses
         const color = d3.scaleOrdinal(d3.schemeCategory10);
 
         const line = d3.line()
             .x(d => x(d[xColumn]))
             .y(d => y(d[yColumn]));
 
-        // Create tooltip
         const tooltip = d3.select('body').append('div')
             .attr('class', 'tooltip')
             .style('position', 'absolute')
@@ -131,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .style('padding', '10px')
             .style('border-radius', '4px');
 
-        // Function to get description based on the column and response
         function getDescription(response, column) {
             const descriptions = {
                 mentalhealthcarecoverage: {
@@ -158,12 +145,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return descriptions[column][response];
         }
 
-        // Draw lines for each response category
         groupedData.forEach((values, key) => {
             console.log(`Drawing line for ${key} with values:`, values);
             const lineGroup = svg.append('g');
 
-            // Draw the line
             lineGroup.append('path')
                 .data([values])
                 .attr('class', 'line')
@@ -178,38 +163,38 @@ document.addEventListener('DOMContentLoaded', function () {
                     d3.select(this).style('stroke-width', '2px');
                 })
                 .on('click', function (event) {
-                    const description = getDescription(key, yColumn); // Get description based on column and line key
-                    // Show tooltip with line name and description
+                    const description = getDescription(key, yColumn); 
                     tooltip.html(`<strong>${key}</strong>: ${description}`)
                         .style('top', `${event.pageY + 15}px`)
                         .style('left', `${event.pageX + 15}px`)
                         .style('visibility', 'visible');
-                    event.stopPropagation(); // Prevent the event from bubbling up to the body click listener
+                    event.stopPropagation(); 
                 });
 
-            // Add legend item for this line
             const legend = svg.append('g')
-                .attr('class', 'legend')
-                .attr('transform', `translate(${width + 30},${key === 'Yes' ? 0 : (key === 'No' ? 30 : 60)})`); // Adjust legend item position
+            .attr('class', 'legend')
+            .attr('transform', `translate(${width + 30},${key === 'Yes' ? 0 : (key === 'No' ? 20 : 40)})`); 
+
 
             legend.append('rect')
                 .attr('x', 0)
                 .attr('y', 0)
-                .attr('width', 20)
-                .attr('height', 20)
+                .attr('width', 10) 
+                .attr('height', 10) 
                 .style('fill', color(key));
 
             legend.append('text')
-                .attr('x', 30)
-                .attr('y', 15)
+                .attr('x', 15) 
+                .attr('y', 8) 
                 .text(key)
-                .style('font-size', '14px')
+                .style('font-size', '10px') 
                 .attr('alignment-baseline', 'middle');
+
+
         });
 
-        // Add axis labels
         svg.append("text")
-            .attr("transform", `translate(${width / 2},${height + margin.top + 40})`) // Adjusted position
+            .attr("transform", `translate(${width / 2},${height + margin.top + 40})`) 
             .style("text-anchor", "middle")
             .text("Year");
 
@@ -221,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .style("text-anchor", "middle")
             .text(yColumn);
 
-        // Hide tooltip when clicking outside the chart area
         d3.select('body').on('click', function () {
             tooltip.style('visibility', 'hidden');
         });
