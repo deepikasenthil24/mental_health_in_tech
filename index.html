@@ -5,24 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D3 Line Chart</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            background-color: #E6E6FA; /* light lilac color */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 960px;
+            padding: 20px;
+            background-color: white; /* Optional: if you want the container area to have a different background */
+            border: 20px solid transparent;
+            border-image: url('lily-petals.png') 12% round; /* Adjust the percentage value as needed */
+        }
+        #chart {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
+            background-color: white; /* Optional: if you want the chart area to have a different background */
+        }
+        .text-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <div>
-        <label>
-            X-Axis:
-            <select id="x-axis-select">
-                <!-- Options will be populated dynamically -->
-            </select>
-        </label>
-        <label>
-            Y-Axis:
-            <select id="y-axis-select">
-                <!-- Options will be populated dynamically -->
-            </select>
-        </label>
-        <button id="update-chart">Update Chart</button>
+    <div class="container">
+        <div class="text-section">
+            <h2>Mental Health in the Lens of Tech Companies</h2>
+            <p>Descriptive text about the chart goes here.</p>
+        </div>
+        <div>
+            <label>
+                X-Axis:
+                <select id="x-axis-select">
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </label>
+            <label>
+                Y-Axis:
+                <select id="y-axis-select">
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </label>
+            <button id="update-chart">Update Chart</button>
+        </div>
+        <div id="chart"></div>
+        <!-- Add a div for the legend -->
+        <div id="legend"></div>
     </div>
-    <div id="chart"></div>
 
     <script src="document.js"></script>
 </body>
