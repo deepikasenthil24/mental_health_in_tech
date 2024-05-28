@@ -3,22 +3,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const xAxisSelect = document.getElementById('x-axis-select');
     const yAxisSelect = document.getElementById('y-axis-select');
 
-    const csvData = `year,response,mentalhealthcarecoverage,awarenessOfOptions
-"2014",Yes,0.414161,0.338506
-"2014",No,0.246363,0.406402
-"2014",Don't Know,0.339476,0.255092
-"2016",Yes,0.499529,0.267483
-"2016",No,0.200754,0.308566
-"2016",Don't Know,0.299717,0.307692
-"2017",Yes,0.581848,0.416796
-"2017",No,0.147488,0.479005
-"2017",Don't Know,0.270665,0.000000
-"2018",Yes,0.626471,0.454294
-"2018",No,0.123529,0.443213
-"2018",Don't Know,0.250000,0.000000
-"2019",Yes,0.573427,0.427632
-"2019",No,0.122378,0.486842
-"2019",Don't Know,0.304196,0.000000`;
+    const csvData = `year,response,mentalhealthcarecoverage,awarenessOfOptions,empDisc,empRes
+"2014",Yes,0.414161,0.338506,0.185257,0.205626
+"2014",No,0.246363,0.406402,0.660524,0.483996
+"2014",Don't Know,0.339476,0.255092,0.154219,0.310378
+"2016",Yes,0.499529,0.267483,0.201049, 0.257867
+"2016",No,0.200754,0.308566,0.708916, 0.462413
+"2016",Don't Know,0.299717,0.307692,0.090035, 0.279720
+"2017",Yes,0.581848,0.416796,0.251944, 0.292379
+"2017",No,0.147488,0.479005,0.636081, 0.433904
+"2017",Don't Know,0.270665,0.000000,0.111975, 0.273717
+"2018",Yes,0.626471,0.454294,0.285319,0.324100
+"2018",No,0.123529,0.443213,0.631579,0.398892
+"2018",Don't Know,0.250000,0.000000,0.083102,0.277008
+"2019",Yes,0.573427,0.427632,0.342105, 0.335526
+"2019",No,0.122378,0.486842,0.578947,0.427632
+"2019",Don't Know,0.304196,0.000000,0.078947,0.236842`;
 
     // Convert CSV data to Base64
     const base64Data = btoa(csvData);
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Populate the select options
     function populateSelectOptions() {
         const xOptions = ['year'];
-        const yOptions = ['mentalhealthcarecoverage', 'awarenessOfOptions'];
+        const yOptions = ['mentalhealthcarecoverage', 'awarenessOfOptions', 'empDisc', 'empRes'];
 
         xOptions.forEach(option => {
             const optionElement = document.createElement('option');
@@ -56,7 +56,9 @@ document.addEventListener('DOMContentLoaded', function () {
             year: parseTime(d.year),
             response: d.response,
             mentalhealthcarecoverage: +d.mentalhealthcarecoverage,
-            awarenessOfOptions: +d.awarenessOfOptions
+            awarenessOfOptions: +d.awarenessOfOptions,
+            empDisc: +d.empDisc,
+            empRes: +d.empRes
         };
     }
 
