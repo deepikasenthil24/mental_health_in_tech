@@ -210,30 +210,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .style("text-anchor", "middle")
             .text(yColumn);
 
-        const legend = svg.append("g")
-            .attr("class", "legend")
-            .attr("transform", `translate(${width + margin.right}, ${margin.top})`);
-
-        // Add legend items
-        const legendItems = legend.selectAll(".legend-item")
-            .data(groupedData.keys())
-            .enter().append("g")
-            .attr("class", "legend-item")
-            .attr("transform", (d, i) => `translate(0, ${i * 20})`);
-
-        legendItems.append("rect")
-            .attr("x", 0)
-            .attr("width", 10)
-            .attr("height", 10)
-            .style("fill", d => color(d));
-
-        legendItems.append("text")
-            .attr("x", 15)
-            .attr("y", 5)
-            .attr("dy", ".35em")
-            .style("text-anchor", "start")
-            .text(d => d);
-
         // Hide tooltip when clicking outside the chart area
         d3.select('body').on('click', function () {
             tooltip.style('visibility', 'hidden');
