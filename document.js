@@ -135,24 +135,24 @@ document.addEventListener('DOMContentLoaded', function () {
         function getDescription(response, column) {
             const descriptions = {
                 mentalhealthcarecoverage: {
-                    'Yes': 'ur a chicken',
-                    'No': 'Description for No - mentalhealthcarecoverage',
-                    "Don't Know": 'Description for Don\'t Know - mentalhealthcarecoverage'
+                    'Yes': 'insert description',
+                    'No': 'insert description',
+                    "Don't Know": 'insert description'
                 },
                 awarenessOfOptions: {
-                    'Yes': 'Description for Yes - awarenessOfOptions',
-                    'No': 'Description for No - awarenessOfOptions',
-                    "Don't Know": 'Description for Don\'t Know - awarenessOfOptions'
+                    'Yes': 'In the begining, the decrease in 2014-2016 seemed bleak because more people became less aware of their mental health coverage. However, over time employees have signicantly become more aware of their mental health coverage from their company.',
+                    'No': 'In the begining, the decrease in 2014-2016 seemed promising that people became more aware of their mental health coverage. However, over time employees have signicantly become aware that they are not aware of their mental health coverage. ',
+                    "Don't Know": 'The proportion of employees who are aware of their mental health care available signifcantly decreased over time. We also see from the other line that employees became more aware of their mental health coverage or not at around the same time of this drop. This might indicate that people have beecome more aware of their mental health in terms of coverage in their company.'
                 },
                 empDisc: {
-                    'Yes': 'Description for Yes - empDisc',
-                    'No': 'Description for No - empDisc',
-                    "Don't Know": 'Description for Don\'t Know - empDisc'
+                    'Yes': 'insert description',
+                    'No': 'insert description',
+                    "Don't Know": 'insert description'
                 },
                 empRes: {
-                    'Yes': 'Description for Yes - empRes',
-                    'No': 'Description for No - empRes',
-                    "Don't Know": 'Description for Don\'t Know - empRes'
+                    'Yes': 'insert description',
+                    'No': 'insert description',
+                    "Don't Know": 'insert description'
                 }
             };
             return descriptions[column][response];
