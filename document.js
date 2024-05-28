@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Clear the existing chart
         d3.select('#chart').selectAll('*').remove();
 
-        const margin = { top: 20, right: 20, bottom: 60, left: 80 }; // Increased bottom margin for y-axis label
+        const margin = { top: 20, right: 150, bottom: 60, left: 80 }; // Adjusted right margin for legend
         const width = 960 - margin.left - margin.right;
         const height = 500 - margin.top - margin.bottom;
 
@@ -187,13 +187,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     event.stopPropagation(); // Prevent the event from bubbling up to the body click listener
                 });
 
-            // Add legend
-            svg.append("text")
-                .attr("transform", `translate(${width},${y(values[0][yColumn])})`)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "start")
-                .style("fill", color(key))
-                .text(key);
+            // Add legend item for this line
+            const legend = svg.append('g')
+                .attr('class', 'legend')
+                .attr('transform', `translate(${width + 30},${key === 'Yes' ? 0 : (key === 'No' ? 30 : 60)})`); // Adjust legend item position
+
+            legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', 20)
+                .attr('height', 20)
+                .style('fill', color(key));
+
+            legend.append('text')
+                .attr('x', 30)
+                .attr('y', 15)
+                .text(key)
+                .style('font-size', '14px')
+                .attr('alignment-baseline', 'middle');
         });
 
         // Add axis labels
