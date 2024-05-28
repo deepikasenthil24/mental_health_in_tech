@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Clear the existing chart
         d3.select('#chart').selectAll('*').remove();
 
-        const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+        const margin = { top: 20, right: 20, bottom: 60, left: 80 }; // Increased bottom margin for y-axis label
         const width = 960 - margin.left - margin.right;
         const height = 500 - margin.top - margin.bottom;
 
@@ -120,16 +120,72 @@ document.addEventListener('DOMContentLoaded', function () {
             .x(d => x(d[xColumn]))
             .y(d => y(d[yColumn]));
 
+        // Create tooltip
+        const tooltip = d3.select('body').append('div')
+            .attr('class', 'tooltip')
+            .style('position', 'absolute')
+            .style('z-index', '10')
+            .style('visibility', 'hidden')
+            .style('background', '#fff')
+            .style('border', '1px solid #000')
+            .style('padding', '10px')
+            .style('border-radius', '4px');
+
+        // Function to get description based on the column and response
+        function getDescription(response, column) {
+            const descriptions = {
+                mentalhealthcarecoverage: {
+                    'Yes': 'ur a chicken',
+                    'No': 'Description for No - mentalhealthcarecoverage',
+                    "Don't Know": 'Description for Don\'t Know - mentalhealthcarecoverage'
+                },
+                awarenessOfOptions: {
+                    'Yes': 'Description for Yes - awarenessOfOptions',
+                    'No': 'Description for No - awarenessOfOptions',
+                    "Don't Know": 'Description for Don\'t Know - awarenessOfOptions'
+                },
+                empDisc: {
+                    'Yes': 'Description for Yes - empDisc',
+                    'No': 'Description for No - empDisc',
+                    "Don't Know": 'Description for Don\'t Know - empDisc'
+                },
+                empRes: {
+                    'Yes': 'Description for Yes - empRes',
+                    'No': 'Description for No - empRes',
+                    "Don't Know": 'Description for Don\'t Know - empRes'
+                }
+            };
+            return descriptions[column][response];
+        }
+
         // Draw lines for each response category
         groupedData.forEach((values, key) => {
             console.log(`Drawing line for ${key} with values:`, values);
-            svg.append('path')
+            const lineGroup = svg.append('g');
+
+            // Draw the line
+            lineGroup.append('path')
                 .data([values])
                 .attr('class', 'line')
                 .attr('d', line)
                 .style('fill', 'none')
                 .style('stroke', color(key))
-                .style('stroke-width', '2px');
+                .style('stroke-width', '2px')
+                .on('mouseover', function () {
+                    d3.select(this).style('stroke-width', '4px');
+                })
+                .on('mouseout', function () {
+                    d3.select(this).style('stroke-width', '2px');
+                })
+                .on('click', function (event) {
+                    const description = getDescription(key, yColumn); // Get description based on column and line key
+                    // Show tooltip with line name and description
+                    tooltip.html(`<strong>${key}</strong>: ${description}`)
+                        .style('top', `${event.pageY + 15}px`)
+                        .style('left', `${event.pageX + 15}px`)
+                        .style('visibility', 'visible');
+                    event.stopPropagation(); // Prevent the event from bubbling up to the body click listener
+                });
 
             // Add legend
             svg.append("text")
@@ -138,6 +194,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("text-anchor", "start")
                 .style("fill", color(key))
                 .text(key);
+        });
+
+        // Add axis labels
+        svg.append("text")
+            .attr("transform", `translate(${width / 2},${height + margin.top + 40})`) // Adjusted position
+            .style("text-anchor", "middle")
+            .text("Year");
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text(yColumn);
+
+        // Hide tooltip when clicking outside the chart area
+        d3.select('body').on('click', function () {
+            tooltip.style('visibility', 'hidden');
         });
     }
 });
