@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D3 Line Chart</title>
+    <title>D3 Line and Bar Charts</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         body {
-            background-color: #E6E6FA;
+            background-color: #E6E6FA; 
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -15,28 +15,6 @@
             flex-direction: column;
             align-items: center;
             height: 100vh;
-        }
-        .container {
-            width: 100%;
-            max-width: 960px;
-            padding: 20px;
-            background-color: white;
-            border: 20px solid transparent;
-            border-image: url('lily-petals.png') 12% round;
-        }
-        #chart {
-            width: 100%;
-            height: 500px;
-            border: 1px solid #ccc;
-            background-color: white;
-        }
-        .text-section {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .text-section h2 {
-            font-family: 'Merriweather', serif; /* Change font to Merriweather */
-            font-size: 26px;
         }
         .lily-decorations {
             width: 100%;
@@ -47,6 +25,45 @@
         .lily-decorations img {
             width: 50px;
             height: auto;
+        }
+        .container {
+            width: 100%;
+            max-width: 960px;
+            padding: 20px;
+            background-color: white; 
+            border: 20px solid transparent;
+            border-image: url('lily-petals.png') 12% round; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart-section {
+            width: 100%;
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 20px solid transparent;
+            border-image: url('lily-petals.png') 12% round; 
+        }
+        .chart-section.scrollable {
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: 300px; /* Adjust the max height as needed */
+        }
+        .text-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .text-section h2 {
+            font-family: 'Merriweather', serif; /* Change font to Merriweather */
+            font-size: 26px;
+        }
+        #chart, #bar-chart {
+            width: 100%;
+            height: 500px;
+        }
+        #bar-chart {
+            height: 800px; /* Adjust this height as necessary */
         }
     </style>
 </head>
@@ -76,8 +93,15 @@
             </label>
             <button id="update-chart">Update Chart</button>
         </div>
-        <div id="chart"></div>
+        <div class="chart-section">
+            <!-- Div for the line chart -->
+            <div id="chart"></div>
+        </div>
         <div id="legend"></div>
+        <div class="chart-section scrollable">
+            <!-- Div for the bar chart -->
+            <div id="bar-chart"></div>
+        </div>
     </div>
     <div class="lily-decorations">
         <img src="flower-30-996x1024.png" alt="Lily Petals">
