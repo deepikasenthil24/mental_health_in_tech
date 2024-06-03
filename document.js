@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             drawChart(data, 'year', 'mentalhealthcarecoverage');
             drawBarChart(data2, 'mentalhealthcarecoverage');
+            updateSubtitle('mentalhealthcarecoverage');
 
             document.getElementById('update-chart').addEventListener('click', () => {
                 const selectedX = xAxisSelect.value;
@@ -92,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Update button clicked. Selected X:', selectedX, 'Selected Y:', selectedY);
                 drawChart(data, selectedX, selectedY);
                 drawBarChart(data2, selectedY);
+                updateSubtitle(selectedY);
             });
         }).catch(error => {
             console.error('Error loading the second CSV data:', error);
@@ -99,6 +101,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }).catch(error => {
         console.error('Error loading the CSV data:', error);
     });
+
+    function updateSubtitle(yAxisName) {
+        const subtitle = document.getElementById('subtitle');
+        switch (yAxisName) {
+            case 'mentalhealthcarecoverage':
+                subtitle.textContent = "Does your employer provide mental health benefits as part of healthcare coverage?";
+                break;
+            case 'awarenessOfOptions':
+                subtitle.textContent = "Do you know the options for mental health care available under your employer-provided coverage?";
+                break;
+            case 'empDisc':
+                subtitle.textContent = "Has your employer ever formally discussed mental health (for example, as part of a wellness campaign or other official)?";
+                break;
+            case 'empRes':
+                subtitle.textContent = "Does your employer offer resources to learn more about mental health concerns and options for seeking help?";
+                break;
+            default:
+                subtitle.textContent = "";
+        }
+    }
 
     function drawChart(data, xColumn, yColumn) {
         console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
@@ -243,27 +265,27 @@ document.addEventListener('DOMContentLoaded', function () {
         function drawBarChart(data, yColumn) {
             console.log('Drawing bar chart with Y:', yColumn);
             d3.select('#bar-chart').selectAll('*').remove();
-    
+        
             const margin = { top: 20, right: 30, bottom: 60, left: 40 };
             const width = 500 - margin.left - margin.right;
             const height = 300 - margin.top - margin.bottom;
-    
+        
             const svg = d3.select('#bar-chart').append('svg')
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom)
                 .append('g')
                 .attr('transform', `translate(${margin.left},${margin.top})`);
-    
+        
             const x = d3.scaleBand()
                 .domain(data.map(d => d.company_size))
                 .range([0, width])
                 .padding(0.1);
-    
+        
             const y = d3.scaleLinear()
                 .domain([0, d3.max(data, d => d[yColumn])])
                 .nice()
                 .range([height, 0]);
-    
+        
             svg.append('g')
                 .attr('class', 'x-axis')
                 .attr('transform', `translate(0,${height})`)
@@ -272,22 +294,62 @@ document.addEventListener('DOMContentLoaded', function () {
                 .style('text-anchor', 'end')
                 .attr('dx', '-.8em')
                 .attr('dy', '.15em')
-                .attr('transform', 'rotate(-45)');
-    
+                .attr('transform', 'rotate(-45)')
+                .attr('font-family', 'Playfair Display'); // Set font-family
+        
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', height + margin.bottom - 10)
+                .style('text-anchor', 'middle')
+                .attr('font-family', 'Playfair Display') // Set font-family
+                .text('Size of Company'); // Set x-axis label
+        
             svg.append('g')
                 .attr('class', 'y-axis')
-                .call(d3.axisLeft(y));
-    
+                .call(d3.axisLeft(y))
+                .append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 6)
+                .attr('dy', '0.71em')
+                .attr('text-anchor', 'end')
+                .text('Proportion of Companies') // Set y-axis label
+                .attr('font-family', 'Playfair Display'); // Set font-family
+        
+            svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 0 - margin.left - 10)
+                .attr('x', 0 - (height / 2))
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .style('font-family', 'Playfair Display') // Set font-family
+                .text('Proportion of Companies')
+                .attr('dx', '-8em');
+            
+        
+            const colors = ["#afc9de", "#8bafc6", "#6baed6", "#4b97c3","#2f7fae","#19608a"];
+            
             svg.selectAll('.bar')
                 .data(data)
                 .enter().append('rect')
                 .attr('class', 'bar')
                 .attr('x', d => x(d.company_size))
-                .attr('y', d => y(d[yColumn]))
                 .attr('width', x.bandwidth())
+                .attr('y', d => y(d[yColumn]))
                 .attr('height', d => height - y(d[yColumn]))
-                .style('fill', 'steelblue');
+                .style('fill', (d, i) => colors[i]);
+        
+            // Title
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 0 - (margin.top / 2))
+                .attr('text-anchor', 'middle')
+                .style('font-size', '16px')
+                .style('font-family', 'Playfair Display') // Set font-family
+                .text('Does your employer provide mental health benefits as part of healthcare coverage?');
         }
+        
+        
+        
     });
     
 

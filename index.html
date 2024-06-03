@@ -63,10 +63,25 @@
             height: 500px;
         }
         #bar-chart {
+            width: 800px; /* Adjust this width as necessary */
             height: 800px; /* Adjust this height as necessary */
+            margin-left: 200px; /* Adjust the margin-left value as necessary */
         }
+        #subtitle {
+            margin: 20px 0;
+            font-size: 19px; /* Adjust the font size as desired */
+            font-weight: bold;
+            text-align: center;
+            font-family: 'Playfair Display', serif; /* Change font to Playfair Display */
+        }
+        .x-axis text {
+            text-anchor: middle; /* Align x-axis labels to the end (right) */
+            transform: translateX(17px); /* Move labels slightly to the right */
+        }
+
     </style>
 </head>
+
 <body>
     <div class="lily-decorations">
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
@@ -93,6 +108,7 @@
             </label>
             <button id="update-chart">Update Chart</button>
         </div>
+        <div id="subtitle"></div> <!-- Subtitle element added here -->
         <div class="chart-section">
             <!-- Div for the line chart -->
             <div id="chart"></div>
@@ -112,5 +128,14 @@
     </div>
 
     <script src="document.js"></script>
+    <script>
+        // Calculate the translation for each x-axis label based on the width of the bars
+        const barWidth = 50; // Adjust this value based on your bar width
+        document.querySelectorAll('.x-axis text').forEach(label => {
+            const labelWidth = label.getBBox().width;
+            const translation = (barWidth - labelWidth) / 2; // Calculate the translation to center the label
+            label.setAttribute('transform', `translate(${translation}, 0)`);
+        });
+    </script>
 </body>
 </html>
