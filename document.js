@@ -75,40 +75,45 @@ document.addEventListener('DOMContentLoaded', function () {
     function drawChart(data, xColumn, yColumn) {
         console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
         d3.select('#chart').selectAll('*').remove();
-
+    
         const margin = { top: 20, right: 150, bottom: 60, left: 80 };
         const width = 960 - margin.left - margin.right;
         const height = 500 - margin.top - margin.bottom;
-
+    
         const svg = d3.select('#chart').append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
-
+    
         console.log('Transformed data:', data);
-
+    
         const groupedData = d3.group(data, d => d.response);
-
+    
         const x = d3.scaleTime().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
-
+    
         x.domain(d3.extent(data, d => d[xColumn]));
         y.domain([0, d3.max(data, d => d[yColumn])]);
-
+    
         svg.append('g')
             .attr('transform', `translate(0,${height})`)
             .call(d3.axisBottom(x));
-
+    
         svg.append('g')
             .call(d3.axisLeft(y));
-
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+    
+        const colorMapping = {
+            'Yes': 'purple',
+            'No': 'pink',
+            "Don't Know": '#0000CD' // Darker blue
+        };
+            
 
         const line = d3.line()
             .x(d => x(d[xColumn]))
             .y(d => y(d[yColumn]));
-
+    
         const tooltip = d3.select('body').append('div')
             .attr('class', 'tooltip')
             .style('position', 'absolute')
@@ -118,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .style('border', '1px solid #000')
             .style('padding', '10px')
             .style('border-radius', '4px');
-
+    
         function getDescription(response, column) {
             const descriptions = {
                 mentalhealthcarecoverage: {
@@ -127,9 +132,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     "Don't Know": 'insert description'
                 },
                 awarenessOfOptions: {
-                    'Yes': 'In the begining, the decrease in 2014-2016 seemed bleak because more people became less aware of their mental health coverage. However, over time employees have signicantly become more aware of their mental health coverage from their company.',
-                    'No': 'In the begining, the decrease in 2014-2016 seemed promising that people became more aware of their mental health coverage. However, over time employees have signicantly become aware that they are not aware of their mental health coverage. ',
-                    "Don't Know": 'The proportion of employees who are aware of their mental health care available signifcantly decreased over time. We also see from the other line that employees became more aware of their mental health coverage or not at around the same time of this drop. This might indicate that people have beecome more aware of their mental health in terms of coverage in their company.'
+                    'Yes': 'In the beginning, the decrease in 2014-2016 seemed bleak because more people became less aware of their mental health coverage. However, over time employees have significantly become more aware of their mental health coverage from their company.',
+                    'No': 'In the beginning, the decrease in 2014-2016 seemed promising that people became more aware of their mental health coverage. However, over time employees have significantly become aware that they are not aware of their mental health coverage.',
+                    "Don't Know": 'The proportion of employees who are aware of their mental health care available significantly decreased over time. We also see from the other line that employees became more aware of their mental health coverage or not at around the same time of this drop. This might indicate that people have become more aware of their mental health in terms of coverage in their company.'
                 },
                 empDisc: {
                     'Yes': 'insert description',
@@ -144,17 +149,17 @@ document.addEventListener('DOMContentLoaded', function () {
             };
             return descriptions[column][response];
         }
-
+    
         groupedData.forEach((values, key) => {
             console.log(`Drawing line for ${key} with values:`, values);
             const lineGroup = svg.append('g');
-
+    
             lineGroup.append('path')
                 .data([values])
                 .attr('class', 'line')
                 .attr('d', line)
                 .style('fill', 'none')
-                .style('stroke', color(key))
+                .style('stroke', colorMapping[key])
                 .style('stroke-width', '2px')
                 .on('mouseover', function () {
                     d3.select(this).style('stroke-width', '4px');
@@ -170,34 +175,31 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style('visibility', 'visible');
                     event.stopPropagation(); 
                 });
-
+    
             const legend = svg.append('g')
-            .attr('class', 'legend')
-            .attr('transform', `translate(${width + 30},${key === 'Yes' ? 0 : (key === 'No' ? 20 : 40)})`); 
-
-
+                .attr('class', 'legend')
+                .attr('transform', `translate(${width + 30},${key === 'Yes' ? 0 : (key === 'No' ? 20 : 40)})`);
+    
             legend.append('rect')
                 .attr('x', 0)
                 .attr('y', 0)
-                .attr('width', 10) 
-                .attr('height', 10) 
-                .style('fill', color(key));
-
+                .attr('width', 10)
+                .attr('height', 10)
+                .style('fill', colorMapping[key]);
+    
             legend.append('text')
-                .attr('x', 15) 
-                .attr('y', 8) 
+                .attr('x', 15)
+                .attr('y', 8)
                 .text(key)
-                .style('font-size', '10px') 
+                .style('font-size', '10px')
                 .attr('alignment-baseline', 'middle');
-
-
         });
-
+    
         svg.append("text")
-            .attr("transform", `translate(${width / 2},${height + margin.top + 40})`) 
+            .attr("transform", `translate(${width / 2},${height + margin.top + 40})`)
             .style("text-anchor", "middle")
             .text("Year");
-
+    
         svg.append("text")
             .attr("transform", "rotate(-90)")
             .attr("y", 0 - margin.left)
@@ -205,9 +207,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .text(yColumn);
-
+    
         d3.select('body').on('click', function () {
             tooltip.style('visibility', 'hidden');
         });
-    }
+    }    
 });
