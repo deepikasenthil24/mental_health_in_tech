@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style("background", "rgba(255, 255, 255, 0.7)")
                         .style("padding", "5px")
                         .style("border-radius", "5px")
-                        .html(`Main Take Away: As we can see, over the past few years it seems like companies have had an increase in mental health benefits provided in employees health care coverage. This is also apparent in the other lines we can see that typically there is decrease over time especially in the "no" line.`);
+                        .html(`Over the past few years it seems like companies have had an increase in mental health benefits provided in employees health care coverage. This is also apparent in the other lines we can see that typically there is decrease over time especially in the "no" line.`);
     
                     // Define arrow marker
                     svg.append("defs").append("marker")
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style("background", "rgba(255, 255, 255, 0.7)")
                         .style("padding", "5px")
                         .style("border-radius", "5px")
-                        .html(`Main Take Away: In 2017, there was a significant drop in awareness of mental health coverage options among employees. This suggests that people over time employees are becoming more aware of whether or not they know the mental health care options provided in their health care plan.`)
+                        .html(`In 2017, there was a significant drop in awareness of mental health coverage options among employees. This suggests that people over time employees are becoming more aware of whether or not they know the mental health care options provided in their health care plan.`)
                     // Define arrow marker if not already defined
                     svg.append("defs").append("marker")
                         .attr("id", "arrow")
