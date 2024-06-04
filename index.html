@@ -16,6 +16,16 @@
             align-items: center;
             height: 100vh;
         }
+        .intro-text {
+            width: 100%;
+            max-width: 960px;
+            padding: 20px;
+            background-color: white; 
+            margin-bottom: 20px;
+            text-align: center;
+            border: 20px solid transparent;
+            border-image: url('lily-petals.png') 12% round; 
+        }
         .lily-decorations {
             width: 100%;
             display: flex;
@@ -58,6 +68,10 @@
             font-family: 'Merriweather', serif; /* Change font to Merriweather */
             font-size: 26px;
         }
+        .text-section p {
+            width: 80%; /* Adjust the width as needed */
+            margin: 0 auto; /* Center the paragraph */
+        }
         #chart, #bar-chart {
             width: 100%;
             height: 500px;
@@ -78,11 +92,16 @@
             text-anchor: middle; /* Align x-axis labels to the end (right) */
             transform: translateX(17px); /* Move labels slightly to the right */
         }
-
     </style>
 </head>
-
 <body>
+    <div class="intro-text">
+        <span style="color: black; font-weight: bold;">SOOO you are thinking of going into tech?
+        Ready to make the BIG BUCKS?</span><br>
+        <span style="color: black; font-weight: bold;">BUT have you ever heard of the saying "health is wealth"?</span> <br>
+        <span style="color: darkblue; font-weight: bold;"> What if tech isn't health, so tech isn't wealth? </span>
+
+    </div>
     <div class="lily-decorations">
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
@@ -93,7 +112,7 @@
     <div class="container">
         <div class="text-section">
             <h2>Mental Health in the Lens of Tech Companies</h2>
-            <p>Descriptive text about the chart goes here.</p>
+            <p>Choose a visualization below to chart a different mental health related statistic using data collected across multiple years about tech workers from different companies.</p>
         </div>
         <div>
             <label>
@@ -126,16 +145,6 @@
         <img src="flower-30-996x1024.png" alt="Lily Petals">
         <img src="flower-30-996x1024.png" alt="Lily Petals">
     </div>
-
     <script src="document.js"></script>
-    <script>
-        // Calculate the translation for each x-axis label based on the width of the bars
-        const barWidth = 50; // Adjust this value based on your bar width
-        document.querySelectorAll('.x-axis text').forEach(label => {
-            const labelWidth = label.getBBox().width;
-            const translation = (barWidth - labelWidth) / 2; // Calculate the translation to center the label
-            label.setAttribute('transform', `translate(${translation}, 0)`);
-        });
-    </script>
 </body>
 </html>
