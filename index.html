@@ -92,6 +92,16 @@
             text-anchor: middle; /* Align x-axis labels to the end (right) */
             transform: translateX(17px); /* Move labels slightly to the right */
         }
+        .end-text {
+            width: 100%;
+            max-width: 960px;
+            padding: 20px;
+            background-color: white; 
+            margin-bottom: 20px;
+            text-align: center;
+            border: 20px solid transparent;
+            border-image: url('lily-petals.png') 12% round; 
+        }
     </style>
 </head>
 <body>
@@ -113,6 +123,13 @@
             <h2>Mental Health in the Lens of Tech Companies</h2>
             <p>Choose a visualization below to chart a different mental health related statistic using data collected across multiple years about tech workers from different companies.</p>
         </div>
+        <div class="text-exp">
+            <span style="color: black;">mentalhealthcarecoverage - discover how mental health benefit inclusion in employers’ healthcare coverage has looked throughout the years</span><br>
+            <span style="color: black;">awarenessOfOptions - are employees more aware of their mental health care options under their employer-provided coverage as time goes on? find out</span><br>
+            <span style="color: black;">empDisc - see if employers are more likely to formally discuss mental health in the workplace place these days compared to before</span><br>
+            <span style="color: black;">empRes - ever wonder whether, throughout recent years, employers at least offer resources to learn more and seek help for mental health related concerns.</span><br>
+        </div>
+        
         <div>
             <label>
                 X-Axis:
@@ -141,12 +158,6 @@
             <!-- Div for the bar chart -->
             <div id="bar-chart"></div>
         </div>
-        <div class="end-text">
-            <span style="color: black; font-weight: bold;">Being conscientious of the size of the company you choose to work at</span><br>
-            <span style="color: black; font-weight: bold;">as well as whether that company is primarily known to provide tech services</span><br>
-            <span style="color: black; font-weight: bold;">is vital since these are choices that put mental health in your hands. </span> <br>
-            <span style="color: darkblue; font-weight: bold;">Be wary! Stay wary!</span>
-        </div>
     </div>
     <div class="lily-decorations">
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
@@ -154,6 +165,12 @@
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
+    </div>
+    <div class="end-text">
+        <span style="color: black; font-weight: bold;">Being conscientious of the size of the company you choose to work at</span><br>
+        <span style="color: black; font-weight: bold;">as well as whether that company is primarily known to provide tech services</span><br>
+        <span style="color: black; font-weight: bold;">is vital since these are choices that put mental health in your hands. </span> <br>
+        <span style="color: darkblue; font-weight: bold;">Be wary! Stay wary!</span>
     </div>
     <script src="document.js"></script>
 </body>

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const xAxisSelect = document.getElementById('x-axis-select');
     const yAxisSelect = document.getElementById('y-axis-select');
 
-    const csvData = `year,response,mentalhealthcarecoverage,awarenessOfOptions,empDisc,empRes
+    const csvData = `year,response,mentalHealthCoverage,awarenessOfOptions,employeerDiscussion,employeerResources
 "2014",Yes,0.414161,0.338506,0.185257,0.205626
 "2014",No,0.246363,0.406402,0.660524,0.483996
 "2014",Don't Know,0.339476,0.255092,0.154219,0.310378
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
 "2019",No,0.122378,0.486842,0.578947,0.427632
 "2019",Don't Know,0.304196,0.000000,0.078947,0.236842`;
 
-    const csvData2 = `company_size,mentalhealthcarecoverage,awarenessOfOptions,empDisc,empRes
+    const csvData2 = `company_size,mentalHealthCoverage,awarenessOfOptions,employeerDiscussion,employeerResources
 "[1-5]",0.14,0.22666666666666666,0.11333333333333333,0.10666666666666667
 "[6-25]",0.2792511700468019,0.21996879875195008,0.0904836193447738,0.0842433697347894
 "[26-100]",0.42712294043092525,0.30925221799746516,0.16603295310519645,0.15082382762991128
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function populateSelectOptions() {
         const xOptions = ['year'];
-        const yOptions = ['mentalhealthcarecoverage', 'awarenessOfOptions', 'empDisc', 'empRes'];
+        const yOptions = ['mentalHealthCoverage', 'awarenessOfOptions', 'employeerDiscussion', 'employeerResources'];
 
         xOptions.forEach(option => {
             const optionElement = document.createElement('option');
@@ -60,20 +60,20 @@ document.addEventListener('DOMContentLoaded', function () {
         return {
             year: parseTime(d.year),
             response: d.response,
-            mentalhealthcarecoverage: +d.mentalhealthcarecoverage,
+            mentalHealthCoverage: +d.mentalHealthCoverage,
             awarenessOfOptions: +d.awarenessOfOptions,
-            empDisc: +d.empDisc,
-            empRes: +d.empRes
+            employeerDiscussion: +d.employeerDiscussion,
+            employeerResources: +d.employeerResources
         };
     }
 
     function rowConverter2(d) {
         return {
             company_size: d.company_size,
-            mentalhealthcarecoverage: +d.mentalhealthcarecoverage,
+            mentalHealthCoverage: +d.mentalHealthCoverage,
             awarenessOfOptions: +d.awarenessOfOptions,
-            empDisc: +d.empDisc,
-            empRes: +d.empRes
+            employeerDiscussion: +d.employeerDiscussion,
+            employeerResources: +d.employeerResources
         };
     }
 
@@ -83,9 +83,9 @@ document.addEventListener('DOMContentLoaded', function () {
         d3.csv(dataURL2, rowConverter2).then(data2 => {
             console.log('Second CSV data loaded:', data2);
 
-            drawChart(data, 'year', 'mentalhealthcarecoverage');
-            drawBarChart(data2, 'mentalhealthcarecoverage');
-            updateSubtitle('mentalhealthcarecoverage');
+            drawChart(data, 'year', 'mentalHealthCoverage');
+            drawBarChart(data2, 'mentalHealthCoverage');
+            updateSubtitle('mentalHealthCoverage');
 
             document.getElementById('update-chart').addEventListener('click', () => {
                 const selectedX = xAxisSelect.value;
@@ -105,16 +105,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateSubtitle(yAxisName) {
         const subtitle = document.getElementById('subtitle');
         switch (yAxisName) {
-            case 'mentalhealthcarecoverage':
+            case 'mentalHealthCoverage':
                 subtitle.textContent = "Does your employer provide mental health benefits as part of healthcare coverage?";
                 break;
             case 'awarenessOfOptions':
                 subtitle.textContent = "Do you know the options for mental health care available under your employer-provided coverage?";
                 break;
-            case 'empDisc':
+            case 'employeerDiscussion':
                 subtitle.textContent = "Has your employer ever formally discussed mental health (for example, as part of a wellness campaign or other official)?";
                 break;
-            case 'empRes':
+            case 'employeerResources':
                 subtitle.textContent = "Does your employer offer resources to learn more about mental health concerns and options for seeking help?";
                 break;
             default:
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
         function getDescription(response, column) {
             const descriptions = {
-                mentalhealthcarecoverage: {
+                mentalHealthCoverage: {
                     'Yes': 'insert description',
                     'No': 'insert description',
                     "Don't Know": 'insert description'
@@ -185,12 +185,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     'No': 'In the beginning, the decrease in 2014-2016 seemed promising that people became more aware of their mental health coverage. However, over time employees have significantly become aware that they are not aware of their mental health coverage.',
                     "Don't Know": 'The proportion of employees who are aware of their mental health care available significantly decreased over time. We also see from the other line that employees became more aware of their mental health coverage or not at around the same time of this drop. This might indicate that people have become more aware of their mental health in terms of coverage in their company.'
                 },
-                empDisc: {
+                employeerDiscussion: {
                     'Yes': 'Employees who responded "Yes" experienced an increase in discrimination over time.',
                     'No': 'Employees who responded "No" experienced a high level of discrimination that remained relatively stable over time.',
                     "Don't Know": 'Employees who responded "Don\'t Know" experienced fluctuations in discrimination, with notable decreases at certain points.'
                 },
-                empRes: {
+                employeerResources: {
                     'Yes': 'Employees who responded "Yes" experienced an increase in resources over time.',
                     'No': 'Employees who responded "No" experienced lower availability of resources that fluctuated over time.',
                     "Don't Know": 'Employees who responded "Don\'t Know" had varying levels of resources, with some significant drops.'
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('alignment-baseline', 'middle');
     
             // Add arrow and annotation for "Yes" line at x value 2018
-            if (key === 'Yes' && yColumn === 'mentalhealthcarecoverage') {
+            if (key === 'Yes' && yColumn === 'employeerResources') {
                 const point2018 = values.find(d => new Date(d[xColumn]).getFullYear() === 2018);
                 if (point2018) {
                     const xPos = x(new Date(point2018[xColumn]));
@@ -352,8 +352,6 @@ document.addEventListener('DOMContentLoaded', function () {
             tooltip.style('visibility', 'hidden');
         });
     }
-    
-    
     
     
         function drawBarChart(data, yColumn) {
