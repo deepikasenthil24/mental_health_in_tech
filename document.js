@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Drawing bar chart with Y:', yColumn);
             d3.select('#bar-chart').selectAll('*').remove();
         
-            const margin = { top: 20, right: 30, bottom: 60, left: 40 };
+            const margin = { top: 20, right: 30, bottom: 60, left: 80 }; // Increased left margin to provide more space
             const width = 500 - margin.left - margin.right;
             const height = 300 - margin.top - margin.bottom;
         
@@ -315,19 +315,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 .text('Proportion of Companies') // Set y-axis label
                 .attr('font-family', 'Playfair Display'); // Set font-family
         
+            // Centered y-axis title and adjusted to avoid overlap with y-axis labels
             svg.append('text')
                 .attr('transform', 'rotate(-90)')
-                .attr('y', 0 - margin.left - 10)
+                .attr('y', 0 - margin.left + 10) // Adjusted to push further left
                 .attr('x', 0 - (height / 2))
                 .attr('dy', '1em')
                 .style('text-anchor', 'middle')
                 .style('font-family', 'Playfair Display') // Set font-family
-                .text('Proportion of Companies')
-                .attr('dx', '-8em');
-            
+                .text('Proportion of Companies');
         
-            const colors = ["#afc9de", "#8bafc6", "#6baed6", "#4b97c3","#2f7fae","#19608a"];
-            
+            const colors = ["#afc9de", "#8bafc6", "#6baed6", "#4b97c3", "#2f7fae", "#19608a"];
+        
             svg.selectAll('.bar')
                 .data(data)
                 .enter().append('rect')
