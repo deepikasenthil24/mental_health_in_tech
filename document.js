@@ -125,44 +125,44 @@ document.addEventListener('DOMContentLoaded', function () {
     function drawChart(data, xColumn, yColumn) {
         console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
         d3.select('#chart').selectAll('*').remove();
-
+    
         const margin = { top: 20, right: 150, bottom: 60, left: 80 };
         const width = 960 - margin.left - margin.right;
         const height = 500 - margin.top - margin.bottom;
-
+    
         const svg = d3.select('#chart').append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
-
+    
         console.log('Transformed data:', data);
-
+    
         const groupedData = d3.group(data, d => d.response);
-
+    
         const x = d3.scaleTime().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
-
+    
         x.domain(d3.extent(data, d => d[xColumn]));
         y.domain([0, d3.max(data, d => d[yColumn])]);
-
+    
         svg.append('g')
             .attr('transform', `translate(0,${height})`)
             .call(d3.axisBottom(x));
-
+    
         svg.append('g')
             .call(d3.axisLeft(y));
-
+    
         const colorMapping = {
             'Yes': 'purple',
             'No': 'pink',
             "Don't Know": '#0000CD' // Darker blue
         };
-
+    
         const line = d3.line()
             .x(d => x(d[xColumn]))
             .y(d => y(d[yColumn]));
-
+    
         const tooltip = d3.select('body').append('div')
             .attr('class', 'tooltip')
             .style('position', 'absolute')
@@ -172,95 +172,189 @@ document.addEventListener('DOMContentLoaded', function () {
             .style('border', '1px solid #000')
             .style('padding', '10px')
             .style('border-radius', '4px');
-
-            function getDescription(response, column) {
-                const descriptions = {
-                    mentalhealthcarecoverage: {
-                        'Yes': 'insert description',
-                        'No': 'insert description',
-                        "Don't Know": 'insert description'
-                    },
-                    awarenessOfOptions: {
-                        'Yes': 'In the beginning, the decrease in 2014-2016 seemed bleak because more people became less aware of their mental health coverage. However, over time employees have significantly become more aware of their mental health coverage from their company.',
-                        'No': 'In the beginning, the decrease in 2014-2016 seemed promising that people became more aware of their mental health coverage. However, over time employees have significantly become aware that they are not aware of their mental health coverage.',
-                        "Don't Know": 'The proportion of employees who are aware of their mental health care available significantly decreased over time. We also see from the other line that employees became more aware of their mental health coverage or not at around the same time of this drop. This might indicate that people have become more aware of their mental health in terms of coverage in their company.'
-                    },
-                    empDisc: {
-                        'Yes': 'Employees who responded "Yes" experienced an increase in discrimination over time.',
-                        'No': 'Employees who responded "No" experienced a high level of discrimination that remained relatively stable over time.',
-                        "Don't Know": 'Employees who responded "Don\'t Know" experienced fluctuations in discrimination, with notable decreases at certain points.'
-                    },
-                    empRes: {
-                        'Yes': 'Employees who responded "Yes" experienced an increase in resources over time.',
-                        'No': 'Employees who responded "No" experienced lower availability of resources that fluctuated over time.',
-                        "Don't Know": 'Employees who responded "Don\'t Know" had varying levels of resources, with some significant drops.'
-                    }
-                };
-                return descriptions[column][response];
+    
+        function getDescription(response, column) {
+            const descriptions = {
+                mentalhealthcarecoverage: {
+                    'Yes': 'insert description',
+                    'No': 'insert description',
+                    "Don't Know": 'insert description'
+                },
+                awarenessOfOptions: {
+                    'Yes': 'In the beginning, the decrease in 2014-2016 seemed bleak because more people became less aware of their mental health coverage. However, over time employees have significantly become more aware of their mental health coverage from their company.',
+                    'No': 'In the beginning, the decrease in 2014-2016 seemed promising that people became more aware of their mental health coverage. However, over time employees have significantly become aware that they are not aware of their mental health coverage.',
+                    "Don't Know": 'The proportion of employees who are aware of their mental health care available significantly decreased over time. We also see from the other line that employees became more aware of their mental health coverage or not at around the same time of this drop. This might indicate that people have become more aware of their mental health in terms of coverage in their company.'
+                },
+                empDisc: {
+                    'Yes': 'Employees who responded "Yes" experienced an increase in discrimination over time.',
+                    'No': 'Employees who responded "No" experienced a high level of discrimination that remained relatively stable over time.',
+                    "Don't Know": 'Employees who responded "Don\'t Know" experienced fluctuations in discrimination, with notable decreases at certain points.'
+                },
+                empRes: {
+                    'Yes': 'Employees who responded "Yes" experienced an increase in resources over time.',
+                    'No': 'Employees who responded "No" experienced lower availability of resources that fluctuated over time.',
+                    "Don't Know": 'Employees who responded "Don\'t Know" had varying levels of resources, with some significant drops.'
+                }
+            };
+            return descriptions[column][response];
+        }
+    
+        groupedData.forEach((values, key) => {
+            console.log(`Drawing line for ${key} with values:`, values);
+            const lineGroup = svg.append('g');
+    
+            lineGroup.append('path')
+                .data([values])
+                .attr('class', 'line')
+                .attr('d', line)
+                .style('fill', 'none')
+                .style('stroke', colorMapping[key])
+                .style('stroke-width', '2px')
+                .on('mouseover', function () {
+                    d3.select(this).style('stroke-width', '4px');
+                })
+                .on('mouseout', function () {
+                    d3.select(this).style('stroke-width', '2px');
+                })
+                .on('click', function (event) {
+                    const description = getDescription(key, yColumn);
+                    tooltip.html(`<strong>${key}</strong>: ${description}`)
+                        .style('top', `${event.pageY + 15}px`)
+                        .style('left', `${event.pageX + 15}px`)
+                        .style('visibility', 'visible');
+                    event.stopPropagation();
+                });
+    
+            const legend = svg.append('g')
+                .attr('class', 'legend')
+                .attr('transform', `translate(${width + 30},${key === 'Yes' ? 0 : (key === 'No' ? 20 : 40)})`);
+    
+            legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', 10)
+                .attr('height', 10)
+                .style('fill', colorMapping[key]);
+    
+            legend.append('text')
+                .attr('x', 15)
+                .attr('y', 8)
+                .text(key)
+                .style('font-size', '10px')
+                .attr('alignment-baseline', 'middle');
+    
+            // Add arrow and annotation for "Yes" line at x value 2018
+            if (key === 'Yes' && yColumn === 'mentalhealthcarecoverage') {
+                const point2018 = values.find(d => new Date(d[xColumn]).getFullYear() === 2018);
+                if (point2018) {
+                    const xPos = x(new Date(point2018[xColumn]));
+                    const yPos = y(point2018[yColumn]);
+    
+                    // Add arrow
+                    svg.append("line")
+                        .attr("x1", xPos - 20) // Adjusted to tilt the line
+                        .attr("y1", yPos + 50)
+                        .attr("x2", xPos)
+                        .attr("y2", yPos)
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#arrow)");
+    
+                    // Add annotation text within a box-like element
+                    svg.append("foreignObject")
+                        .attr("x", xPos - 120) // Adjusted to position annotation
+                        .attr("y", yPos + 55)  // Adjusted to position annotation below the arrow
+                        .attr("width", 250)     // Adjust the width as needed
+                        .attr("height", 100)     // Adjust the height as needed
+                        .append("xhtml:div")
+                        .style("font", "12px 'Arial'")
+                        .style("color", "black")
+                        .style("background", "rgba(255, 255, 255, 0.7)")
+                        .style("padding", "5px")
+                        .style("border-radius", "5px")
+                        .html(`Main Take Away: As we can see, over the past few years it seems like companies have had an increase in mental health benefits provided in employees health care coverage. This is also apparent in the other lines we can see that typically there is decrease over time especially in the "no" line.`);
+    
+                    // Define arrow marker
+                    svg.append("defs").append("marker")
+                        .attr("id", "arrow")
+                        .attr("viewBox", "0 0 10 10")
+                        .attr("refX", 8) // Adjusted to fix the arrow head
+                        .attr("refY", 5)
+                        .attr("markerWidth", 6)
+                        .attr("markerHeight", 6)
+                        .attr("orient", "auto")
+                        .append("path")
+                        .attr("d", "M 0 0 L 10 5 L 0 10 z")
+                        .attr("fill", "black");
+                }
             }
     
-            groupedData.forEach((values, key) => {
-                console.log(`Drawing line for ${key} with values:`, values);
-                const lineGroup = svg.append('g');
+            // Add arrow and annotation for "Don't Know" line at x value 2017 for awarenessOfOptions
+            if (key === "Don't Know" && yColumn === 'awarenessOfOptions') {
+                const point2017 = values.find(d => new Date(d[xColumn]).getFullYear() === 2017);
+                if (point2017) {
+                    const xPos = x(new Date(point2017[xColumn]));
+                    const yPos = y(point2017[yColumn]);
     
-                lineGroup.append('path')
-                    .data([values])
-                    .attr('class', 'line')
-                    .attr('d', line)
-                    .style('fill', 'none')
-                    .style('stroke', colorMapping[key])
-                    .style('stroke-width', '2px')
-                    .on('mouseover', function () {
-                        d3.select(this).style('stroke-width', '4px');
-                    })
-                    .on('mouseout', function () {
-                        d3.select(this).style('stroke-width', '2px');
-                    })
-                    .on('click', function (event) {
-                        const description = getDescription(key, yColumn);
-                        tooltip.html(`<strong>${key}</strong>: ${description}`)
-                            .style('top', `${event.pageY + 15}px`)
-                            .style('left', `${event.pageX + 15}px`)
-                            .style('visibility', 'visible');
-                        event.stopPropagation();
-                    });
+                    // Add arrow
+                    svg.append("line")
+                        .attr("x1", xPos + 20) // Adjusted to tilt the line to the right
+                        .attr("y1", yPos - 50)
+                        .attr("x2", xPos)
+                        .attr("y2", yPos)
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#arrow)");
     
-                const legend = svg.append('g')
-                    .attr('class', 'legend')
-                    .attr('transform', `translate(${width + 30},${key === 'Yes' ? 0 : (key === 'No' ? 20 : 40)})`);
+                    // Add annotation text within a box-like element
+                    svg.append("foreignObject")
+                        .attr("x", xPos + 30) // Adjusted to position annotation
+                        .attr("y", yPos - 120)  // Adjusted to position annotation above the arrow
+                        .attr("width", 250)     // Adjust the width as needed
+                        .attr("height", 130)    // Adjust the height as needed
+                        .append("xhtml:div")
+                        .style("font", "12px 'Arial'")
+                        .style("color", "black")
+                        .style("background", "rgba(255, 255, 255, 0.7)")
+                        .style("padding", "5px")
+                        .style("border-radius", "5px")
+                        .html(`Main Take Away: In 2017, there was a significant drop in awareness of mental health coverage options among employees. This suggests that people over time employees are becoming more aware of whether or not they know the mental health care options provided in their health care plan.`)
+                    // Define arrow marker if not already defined
+                    svg.append("defs").append("marker")
+                        .attr("id", "arrow")
+                        .attr("viewBox", "0 0 10 10")
+                        .attr("refX", 8)
+                        .attr("refY", 5)
+                        .attr("markerWidth", 6)
+                        .attr("markerHeight", 6)
+                        .attr("orient", "auto")
+                        .append("path")
+                        .attr("d", "M 0 0 L 10 5 L 0 10 z")
+                        .attr("fill", "black");
+                }
+            }
+        });
     
-                legend.append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', 10)
-                    .attr('height', 10)
-                    .style('fill', colorMapping[key]);
+        svg.append("text")
+            .attr("transform", `translate(${width / 2},${height + margin.top + 40})`)
+            .style("text-anchor", "middle")
+            .text("Year");
     
-                legend.append('text')
-                    .attr('x', 15)
-                    .attr('y', 8)
-                    .text(key)
-                    .style('font-size', '10px')
-                    .attr('alignment-baseline', 'middle');
-            });
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Proportion of Responses");
     
-            svg.append("text")
-                .attr("transform", `translate(${width / 2},${height + margin.top + 40})`)
-                .style("text-anchor", "middle")
-                .text("Year");
+        d3.select('body').on('click', function () {
+            tooltip.style('visibility', 'hidden');
+        });
+    }
     
-            svg.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0 - margin.left)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text(yColumn);
     
-            d3.select('body').on('click', function () {
-                tooltip.style('visibility', 'hidden');
-            });
-        }
+    
     
         function drawBarChart(data, yColumn) {
             console.log('Drawing bar chart with Y:', yColumn);
@@ -312,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('y', 6)
                 .attr('dy', '0.71em')
                 .attr('text-anchor', 'end')
-                .text('Proportion of Companies') // Set y-axis label
+                .text('Proportion of Responses') // Set y-axis label
                 .attr('font-family', 'Playfair Display'); // Set font-family
         
             // Centered y-axis title and adjusted to avoid overlap with y-axis labels
@@ -323,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('dy', '1em')
                 .style('text-anchor', 'middle')
                 .style('font-family', 'Playfair Display') // Set font-family
-                .text('Proportion of Companies');
+                .text('Proportion of Responses');
         
             const colors = ["#afc9de", "#8bafc6", "#6baed6", "#4b97c3", "#2f7fae", "#19608a"];
         
@@ -345,9 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .style('font-size', '16px')
                 .style('font-family', 'Playfair Display') // Set font-family
                 .text('Does your employer provide mental health benefits as part of healthcare coverage?');
-        }
-        
-        
+        }    
         
     });
     
