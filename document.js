@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Define your CSV data
     const csvData3 = `istechcomp,mentalHealthCoverage,awarenessOfOptions,employeerDiscussion,employeerResources
-    "No",410,298,238,0.1
-    "Yes",1283,919,238,0.630`;
+    "Not Tech Company",410,298,238,284
+    "Tech Company",1283,919,238,630`;
 
     // Parse the CSV data
     const parsedData3 = d3.csvParse(csvData3);
@@ -474,17 +474,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('x', width / 2)
                 .attr('y', 0 - (margin.top / 2))
                 .attr('text-anchor', 'middle')
-                .style('font-size', '16px')
+                .style('font-size', '14px')
                 .style('font-family', 'Playfair Display') // Set font-family
                 .text('Does your employer provide mental health benefits as part of healthcare coverage?');
         }    
         
         function drawPieChart(data, yColumn) {
-            const width = 500;
-            const height = 500;
+            const width = 300;
+            const height = 300;
             const radius = Math.min(width, height) / 2;
         
-            const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+            const colorScale = d3.scaleOrdinal()
+                .domain(data.map(d => d.istechcomp))
+                .range(['#DDA0DD', '#87CEEB']);
+
         
             // Select the SVG element and remove any existing pie chart elements
             const svg = d3.select('#pie-chart')
@@ -513,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
             g.append('path')
                 .attr('d', arc)
-                .style('fill', d => color(d.data.istechcomp)) // Check if istechcomp is correctly used for color
+                .style('fill', d => colorScale(d.data.istechcomp)) // Check if istechcomp is correctly used for color
                 .append('title')
                 .text(d => d.data.istechcomp); // Ensure istechcomp is used for the title
         

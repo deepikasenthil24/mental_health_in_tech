@@ -88,6 +88,24 @@
             text-align: center;
             font-family: 'Playfair Display', serif; /* Change font to Playfair Display */
         }
+        #pie-chart {
+            margin-left: 350px;
+            position: relative;
+            transform: translateY(-100px);
+            top: -300px; /* Adjust the top position as needed */
+        }
+        #pie-chart text:nth-child(1) {
+            font-size: 12px; /* Adjust the font size as needed */
+            dx: -20px; /* Adjust the horizontal position */
+            dy: -5px;
+        }
+
+        #pie-chart text:nth-child(2) {
+            font-size: 12px; /* Adjust the font size as needed */
+            dx: -10px; /* Adjust the horizontal position */
+            dy: -10px;
+        }
+
         .x-axis text {
             text-anchor: middle; /* Align x-axis labels to the end (right) */
             transform: translateX(17px); /* Move labels slightly to the right */
@@ -157,8 +175,14 @@
         <div class="chart-section scrollable">
             <!-- Div for the bar chart -->
             <div id="bar-chart"></div>
-            <div id="pie-chart"></div>
-        </div>
+            <div id="pie-chart">
+                <svg width="300" height="300">
+                    <!-- Pie chart elements -->
+                    <text x="150" y="150" font-size="12" style="transform: translate(-10px, -5px);">Label 1</text>
+                    <text x="150" y="170" font-size="12" style="transform: translate(-10px, -10px);">Label 2</text>
+                </svg>
+            </div>
+        </div>        
     </div>
     <div class="lily-decorations">
         <img src="flowers-2393618_640.webp" alt="Lily Petals">
