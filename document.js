@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('alignment-baseline', 'middle');
     
             // Add arrow and annotation for "Yes" line at x value 2018
-            if (key === 'Yes' && yColumn === 'employeerResources') {
+            if (key === 'Yes' && yColumn === 'mentalHealthCoverage') {
                 const point2018 = values.find(d => new Date(d[xColumn]).getFullYear() === 2018);
                 if (point2018) {
                     const xPos = x(new Date(point2018[xColumn]));
