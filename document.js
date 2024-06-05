@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             drawChart(data, 'year', 'mentalHealthCoverage');
             drawBarChart(data2, 'mentalHealthCoverage');
-            drawPieChart(parsedData3, 'mentalHealthCoverage');
+            drawPieChart(parsedData3, 'mentalHealthCoverage', 'Distribution of Company Type from Responses' );
             updateSubtitle('mentalHealthCoverage');
 
             document.getElementById('update-chart').addEventListener('click', () => {
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             
                 // Draw the pie chart with the filtered data and selected y-axis value
-                drawPieChart(filteredData, selectedY);
+                drawPieChart(filteredData, selectedY,'Distribution of Company Type from Responses');
             });
         }).catch(error => {
             console.error('Error loading the second CSV data:', error);
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('y', 6)
                 .attr('dy', '0.71em')
                 .attr('text-anchor', 'end')
-                .text('Proportion of Responses') // Set y-axis label
+                .text('Proportion of Yes Responses') // Set y-axis label
                 .attr('font-family', 'Playfair Display'); // Set font-family
         
             // Centered y-axis title and adjusted to avoid overlap with y-axis labels
@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('dy', '1em')
                 .style('text-anchor', 'middle')
                 .style('font-family', 'Playfair Display') // Set font-family
-                .text('Proportion of Responses');
+                .text('Proportion of Yes Responses');
         
             const colors = ["#afc9de", "#8bafc6", "#6baed6", "#4b97c3", "#2f7fae", "#19608a"];
         
@@ -479,16 +479,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 .text('Does your employer provide mental health benefits as part of healthcare coverage?');
         }    
         
-        function drawPieChart(data, yColumn) {
+        function drawPieChart(data, yColumn, title) {
             const width = 300;
             const height = 300;
             const radius = Math.min(width, height) / 2;
         
-
             const colorScale = d3.scaleOrdinal()
                 .domain(data.map(d => d.istechcomp))
                 .range(['#DDA0DD', '#87CEEB']);
-
         
             // Select the SVG element and remove any existing pie chart elements
             const svg = d3.select('#pie-chart')
@@ -502,6 +500,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr('height', height)
                 .append('g')
                 .attr('transform', `translate(${width / 2},${height / 2})`);
+        
+            // Append title to the SVG
+            svg.append('text')
+                .attr('x', 0)
+                .attr('y', -height / 2 - 10) // Adjust the y position for the title
+                .attr('text-anchor', 'middle')
+                .text(title)
+                .style('font-size', '16px')
+                .style('font-weight', 'bold');
         
             const arc = d3.arc()
                 .innerRadius(0)
@@ -522,11 +529,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 .text(d => d.data.istechcomp); // Ensure istechcomp is used for the title
         
             g.append('text')
-                .attr('transform', d => `translate(${arc.centroid(d)})`)
+                .attr('transform', d => `translate(${arc.centroid(d)[0] - 10}, ${arc.centroid(d)[1]})`) // Adjust the x-coordinate by subtracting 10 (or any other desired value)
                 .attr('dy', '.35em')
                 .text(d => d.data.istechcomp)
                 .style('text-anchor', 'middle');
-        }        
+        }     
         
     });
     
