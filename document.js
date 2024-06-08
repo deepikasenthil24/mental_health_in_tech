@@ -95,6 +95,21 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+    function getChartTitle(selectedY) {
+        switch (selectedY) {
+            case 'mentalHealthCoverage':
+                return 'Mental Health Coverage';
+            case 'awarenessOfOptions':
+                return 'Awareness of Options';
+            case 'employeerDiscussion':
+                return 'Employer Discussion';
+            case 'employeerResources':
+                return 'Employer Resources';
+            default:
+                return 'Default Title';
+        }
+    }    
+
     d3.csv(dataURL, rowConverter).then(data => {
         console.log('CSV data loaded:', data);
 
@@ -133,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Draw the pie chart with the filtered data and selected y-axis value
-                drawPieChart(filteredData, selectedY, 'Distribution of Company Type from Responses');
+                drawPieChart(filteredData, selectedY, getChartTitle(selectedY));
             });
         }).catch(error => {
             console.error('Error loading the second CSV data:', error);
@@ -176,7 +191,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return "";
         }
     }
-
 
     function drawChart(data, xColumn, yColumn) {
         console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
@@ -609,35 +623,54 @@ document.addEventListener('DOMContentLoaded', function () {
             .style('font-family', 'Playfair Display') // Set font-family
             .text(chartTitle);
     }
-        
         function drawPieChart(data, yColumn, title) {
             const width = 300;
             const height = 300;
             const radius = Math.min(width, height) / 2;
+            const margin = { top: 50, right: 20, bottom: 20, left: 20 }; // Increased top margin
         
             const colorScale = d3.scaleOrdinal()
                 .domain(data.map(d => d.istechcomp))
                 .range(['#DDA0DD', '#87CEEB']);
         
-            // Select the SVG element and remove any existing pie chart elements
+            // Clear previous chart if exists
+            d3.select('#pie-chart').selectAll('*').remove();
+        
+            // Create SVG element
             const svg = d3.select('#pie-chart')
-                .selectAll('svg')
-                .remove()
-                .exit()
-                .data([data])
-                .enter()
                 .append('svg')
-                .attr('width', width)
-                .attr('height', height)
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
                 .append('g')
-                .attr('transform', `translate(${width / 2},${height / 2})`);
+                .attr('transform', `translate(${(width + margin.left + margin.right) / 2},${(height + margin.top + margin.bottom) / 2})`);
+        
+            // Split title into two lines
+            const splitTitle = (title) => {
+                const words = title.split(' ');
+                const midpoint = Math.floor(words.length / 2);
+        
+                let line1 = words.slice(0, midpoint).join(' ');
+                let line2 = words.slice(midpoint).join(' ');
+        
+                return [line1, line2];
+            };
+        
+            const [line1, line2] = splitTitle(title);
         
             // Append title to the SVG
             svg.append('text')
                 .attr('x', 0)
-                .attr('y', -height / 2 - 10) // Adjust the y position for the title
+                .attr('y', -height / 2 - margin.top / 2)
                 .attr('text-anchor', 'middle')
-                .text(title)
+                .text(line1)
+                .style('font-size', '16px')
+                .style('font-weight', 'bold');
+        
+            svg.append('text')
+                .attr('x', 0)
+                .attr('y', -height / 2 - margin.top / 2 + 20) // Adjust y position for the second line
+                .attr('text-anchor', 'middle')
+                .text(line2)
                 .style('font-size', '16px')
                 .style('font-weight', 'bold');
         
@@ -646,25 +679,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 .outerRadius(radius);
         
             const pie = d3.pie()
-                .value(d => d[yColumn]); // Use the selected y-axis value for the pie chart
+                .value(d => d[yColumn]);
         
             const g = svg.selectAll('.arc')
-                .data(pie(data)) // Ensure correct data is bound here
+                .data(pie(data))
                 .enter().append('g')
                 .attr('class', 'arc');
         
             g.append('path')
                 .attr('d', arc)
-                .style('fill', d => colorScale(d.data.istechcomp)) // Check if istechcomp is correctly used for color
+                .style('fill', d => colorScale(d.data.istechcomp))
                 .append('title')
-                .text(d => d.data.istechcomp); // Ensure istechcomp is used for the title
+                .text(d => d.data.istechcomp);
         
             g.append('text')
-                .attr('transform', d => `translate(${arc.centroid(d)[0] - 10}, ${arc.centroid(d)[1]})`) // Adjust the x-coordinate by subtracting 10 (or any other desired value)
+                .attr('transform', d => `translate(${arc.centroid(d)[0]}, ${arc.centroid(d)[1]})`)
                 .attr('dy', '.35em')
                 .text(d => d.data.istechcomp)
-                .style('text-anchor', 'middle');
-        }     
+                .style('text-anchor', 'middle')
+                .style('fill', 'white') // Ensure the text is visible by setting the fill color to white
+                .style('font-size', '10px'); // Adjust font size as needed
+        }
+    
+    
+        
+        
         
     });
     
