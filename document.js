@@ -290,8 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         else break; //position found
                     }
         
-                    const description = getDescription(key, yColumn);
-                    tooltip.html(`<strong>${key}</strong>: y-axis: ${y.invert(target.y).toFixed(2)}<br>Description: ${description}`)
+                    tooltip.html(`<strong>${key}</strong>: y-axis: ${y.invert(target.y).toFixed(2)}`)
                         .style('top', `${event.pageY + 15}px`)
                         .style('left', `${event.pageX + 15}px`)
                         .style('visibility', 'visible');
