@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Second CSV data loaded:', data2);
 
             drawChart(data, 'year', 'mentalHealthCoverage');
-            drawBarChart(data2, 'mentalHealthCoverage');
-            drawPieChart(parsedData3, 'mentalHealthCoverage', 'Distribution of Company Type from Responses' );
+            drawBarChart(data2, 'mentalHealthCoverage', 'Employer-Provided Mental Health Coverage Across Company Sizes');
+            drawPieChart(parsedData3, 'mentalHealthCoverage', 'Distribution of Company Type from Responses');
             updateSubtitle('mentalHealthCoverage');
 
             document.getElementById('update-chart').addEventListener('click', () => {
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const selectedY = yAxisSelect.value;
                 console.log('Update button clicked. Selected X:', selectedX, 'Selected Y:', selectedY);
                 drawChart(data, selectedX, selectedY);
-                drawBarChart(data2, selectedY);
+                drawBarChart(data2, selectedY, getChartTitle(selectedY));
                 updateSubtitle(selectedY);
 
                 let filteredData = parsedData3;
@@ -131,9 +131,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     default:
                         filteredData = parsedData3;
                 }
-            
+
                 // Draw the pie chart with the filtered data and selected y-axis value
-                drawPieChart(filteredData, selectedY,'Distribution of Company Type from Responses');
+                drawPieChart(filteredData, selectedY, 'Distribution of Company Type from Responses');
             });
         }).catch(error => {
             console.error('Error loading the second CSV data:', error);
@@ -161,6 +161,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 subtitle.textContent = "";
         }
     }
+
+    function getChartTitle(yColumn) {
+        switch (yColumn) {
+            case 'mentalHealthCoverage':
+                return "Employer-Provided Mental Health Coverage Across Company Sizes";
+            case 'awarenessOfOptions':
+                return "Employee Awareness of Mental Health Care Options by Company Size";
+            case 'employeerDiscussion':
+                return "Formal Discussions on Mental Health in the Workplace by Company Size";
+            case 'employeerResources':
+                return "Provision of Mental Health Resources by Employers and Company Size";
+            default:
+                return "";
+        }
+    }
+
 
     function drawChart(data, xColumn, yColumn) {
         console.log('Drawing chart with X:', xColumn, 'Y:', yColumn);
@@ -242,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function () {
         groupedData.forEach((values, key) => {
             console.log(`Drawing line for ${key} with values:`, values);
             const lineGroup = svg.append('g');
-    
+        
             lineGroup.append('path')
                 .data([values])
                 .attr('class', 'line')
@@ -257,13 +273,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     d3.select(this).style('stroke-width', '2px');
                 })
                 .on('click', function (event) {
+                    const [mouseX, mouseY] = d3.pointer(event);
+                    const pathLength = this.getTotalLength();
+                    let beginning = 0,
+                        end = pathLength,
+                        target = null;
+        
+                    while (true) {
+                        const position = Math.floor((beginning + end) / 2);
+                        target = this.getPointAtLength(position);
+                        if ((position === end || position === beginning) && target.x !== mouseX) {
+                            break;
+                        }
+                        if (target.x > mouseX) end = position;
+                        else if (target.x < mouseX) beginning = position;
+                        else break; //position found
+                    }
+        
                     const description = getDescription(key, yColumn);
-                    tooltip.html(`<strong>${key}</strong>: ${description}`)
+                    tooltip.html(`<strong>${key}</strong>: y-axis: ${y.invert(target.y).toFixed(2)}<br>Description: ${description}`)
                         .style('top', `${event.pageY + 15}px`)
                         .style('left', `${event.pageX + 15}px`)
                         .style('visibility', 'visible');
                     event.stopPropagation();
-                });
+        });
     
             const legend = svg.append('g')
                 .attr('class', 'legend')
@@ -358,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style("background", "rgba(255, 255, 255, 0.7)")
                         .style("padding", "5px")
                         .style("border-radius", "5px")
-                        .html(`In 2017, there was a significant drop in awareness of mental health coverage options among employees. This suggests that people over time employees are becoming more aware of whether or not they know the mental health care options provided in their health care plan.`)
+                        .html(`In 2017, there was a significant drop in awareness of mental health coverage options among employees. This suggests that employees are becoming more aware of whether or not they know the mental health care options provided in their health care plan.`)
                     // Define arrow marker if not already defined
                     svg.append("defs").append("marker")
                         .attr("id", "arrow")
@@ -373,6 +406,105 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("fill", "black");
                 }
             }
+            if (key === 'Yes' && yColumn === 'employeerDiscussion') {
+                const point2018 = values.find(d => new Date(d[xColumn]).getFullYear() === 2018);
+                if (point2018) {
+                    const xPos = x(new Date(point2018[xColumn]));
+                    const yPos = y(point2018[yColumn]);
+            
+                    // Define arrow marker
+                    svg.append("defs").append("marker")
+                        .attr("id", "arrow")
+                        .attr("viewBox", "0 0 10 10")
+                        .attr("refX", 8)
+                        .attr("refY", 5)
+                        .attr("markerWidth", 6)
+                        .attr("markerHeight", 6)
+                        .attr("orient", "auto")
+                        .append("path")
+                        .attr("d", "M 0 0 L 10 5 L 0 10 z")
+                        .attr("fill", "black");
+            
+                    // Add arrow
+                    svg.append("line")
+                        .attr("x1", xPos)
+                        .attr("y1", yPos - 30) // Arrow above the line
+                        .attr("x2", xPos)
+                        .attr("y2", yPos)
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#arrow)");
+            
+                    const textX = xPos - 50;
+                    const textY = yPos - 140;
+                    const annotationText = "Here we see an increase in employeers campaigning about mental health. This might indicate that tech companies are taking mental health into account more now than in the past.";
+            
+                    // Add a foreignObject for text wrapping
+                    svg.append("foreignObject")
+                        .attr("x", textX)
+                        .attr("y", textY)
+                        .attr("width", 250)     // Adjust the width as needed
+                        .attr("height", 130) // Adjust height as needed
+                        .append("xhtml:div")
+                        .style("font-size", "12px")
+                        .style("background", "rgba(255, 255, 255, 0.7)")
+                        .style("padding", "5px")
+                        .style("border", "1px solid transparent") // Invisible box
+                        .style("width", "150px") // Same as width of foreignObject
+                        .html(annotationText);
+                }
+            }
+
+        // Define arrow marker
+        svg.append("defs").append("marker")
+        .attr("id", "arrow")
+        .attr("viewBox", "0 0 10 10")
+        .attr("refX", 8)
+        .attr("refY", 5)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 8)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M 0 0 L 10 5 L 0 10 z"); // Arrowhead path
+
+        // Add arrow and annotation for "Don't Know" line at x value 2017
+        if (key === "Don't Know" && yColumn === 'employeerResources') {
+        const point2017 = values.find(d => new Date(d[xColumn]).getFullYear() === 2017);
+        if (point2017) {
+            const xPos = x(new Date(point2017[xColumn]));
+            const yPos = y(point2017[yColumn]);
+
+            // Add arrow pointing to the line
+            svg.append("line")
+                .attr("x1", xPos)
+                .attr("y1", yPos + 20) // Starting point below the line
+                .attr("x2", xPos)
+                .attr("y2", yPos) // Ending point at the line
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+                .attr("marker-end", "url(#arrow)");
+
+            // Annotation text for the arrow
+            const annotationText = "Over time, the don't know line steadily decreases. This suggest that that these educational resources being offered might be effective informing people to at least know whether their employer offers these resources.  This idea is supported with the yes line is steadily increasing and the no line is steadily decreasing over time.";
+            const textX = xPos - 50; // Adjust position
+            const textY = yPos + 20; // Adjust position
+
+            // Add a foreignObject for text wrapping
+            svg.append("foreignObject")
+                .attr("x", textX)
+                .attr("y", textY)
+                .attr("width", 200) // Adjust width
+                .attr("height", 160) // Adjust height
+                .append("xhtml:div")
+                .style("font-size", "12px")
+                .style("background", "rgba(255, 255, 255, 0.7)")
+                .style("padding", "5px")
+                .style("border-radius", "5px")
+                .html(annotationText);
+        }
+    }
+
+
         });
     
         svg.append("text")
@@ -394,90 +526,90 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     
-        function drawBarChart(data, yColumn) {
-            console.log('Drawing bar chart with Y:', yColumn);
-            d3.select('#bar-chart').selectAll('*').remove();
-        
-            const margin = { top: 20, right: 30, bottom: 60, left: 80 }; // Increased left margin to provide more space
-            const width = 500 - margin.left - margin.right;
-            const height = 300 - margin.top - margin.bottom;
-        
-            const svg = d3.select('#bar-chart').append('svg')
-                .attr('width', width + margin.left + margin.right)
-                .attr('height', height + margin.top + margin.bottom)
-                .append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-        
-            const x = d3.scaleBand()
-                .domain(data.map(d => d.company_size))
-                .range([0, width])
-                .padding(0.1);
-        
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d[yColumn])])
-                .nice()
-                .range([height, 0]);
-        
-            svg.append('g')
-                .attr('class', 'x-axis')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .style('text-anchor', 'end')
-                .attr('dx', '-.8em')
-                .attr('dy', '.15em')
-                .attr('transform', 'rotate(-45)')
-                .attr('font-family', 'Playfair Display'); // Set font-family
-        
-            svg.append('text')
-                .attr('x', width / 2)
-                .attr('y', height + margin.bottom - 10)
-                .style('text-anchor', 'middle')
-                .attr('font-family', 'Playfair Display') // Set font-family
-                .text('Size of Company'); // Set x-axis label
-        
-            svg.append('g')
-                .attr('class', 'y-axis')
-                .call(d3.axisLeft(y))
-                .append('text')
-                .attr('transform', 'rotate(-90)')
-                .attr('y', 6)
-                .attr('dy', '0.71em')
-                .attr('text-anchor', 'end')
-                .text('Proportion of Yes Responses') // Set y-axis label
-                .attr('font-family', 'Playfair Display'); // Set font-family
-        
-            // Centered y-axis title and adjusted to avoid overlap with y-axis labels
-            svg.append('text')
-                .attr('transform', 'rotate(-90)')
-                .attr('y', 0 - margin.left + 10) // Adjusted to push further left
-                .attr('x', 0 - (height / 2))
-                .attr('dy', '1em')
-                .style('text-anchor', 'middle')
-                .style('font-family', 'Playfair Display') // Set font-family
-                .text('Proportion of Yes Responses');
-        
-            const colors = ["#afc9de", "#8bafc6", "#6baed6", "#4b97c3", "#2f7fae", "#19608a"];
-        
-            svg.selectAll('.bar')
-                .data(data)
-                .enter().append('rect')
-                .attr('class', 'bar')
-                .attr('x', d => x(d.company_size))
-                .attr('width', x.bandwidth())
-                .attr('y', d => y(d[yColumn]))
-                .attr('height', d => height - y(d[yColumn]))
-                .style('fill', (d, i) => colors[i]);
-        
-            // Title
-            svg.append('text')
-                .attr('x', width / 2)
-                .attr('y', 0 - (margin.top / 2))
-                .attr('text-anchor', 'middle')
-                .style('font-size', '14px')
-                .style('font-family', 'Playfair Display') // Set font-family
-                .text('Does your employer provide mental health benefits as part of healthcare coverage?');
-        }    
+    function drawBarChart(data, yColumn, chartTitle) {
+        console.log('Drawing bar chart with Y:', yColumn);
+        d3.select('#bar-chart').selectAll('*').remove();
+
+        const margin = { top: 20, right: 30, bottom: 60, left: 80 }; // Increased left margin to provide more space
+        const width = 500 - margin.left - margin.right;
+        const height = 300 - margin.top - margin.bottom;
+
+        const svg = d3.select('#bar-chart').append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleBand()
+            .domain(data.map(d => d.company_size))
+            .range([0, width])
+            .padding(0.1);
+
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d[yColumn])])
+            .nice()
+            .range([height, 0]);
+
+        svg.append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(0,${height})`)
+            .call(d3.axisBottom(x))
+            .selectAll('text')
+            .style('text-anchor', 'end')
+            .attr('dx', '-.8em')
+            .attr('dy', '.15em')
+            .attr('transform', 'rotate(-45)')
+            .attr('font-family', 'Playfair Display'); // Set font-family
+
+        svg.append('text')
+            .attr('x', width / 2)
+            .attr('y', height + margin.bottom - 10)
+            .style('text-anchor', 'middle')
+            .attr('font-family', 'Playfair Display') // Set font-family
+            .text('Size of Company'); // Set x-axis label
+
+        svg.append('g')
+            .attr('class', 'y-axis')
+            .call(d3.axisLeft(y))
+            .append('text')
+            .attr('transform', 'rotate(-90)')
+            .attr('y', 6)
+            .attr('dy', '0.71em')
+            .attr('text-anchor', 'end')
+            .text('Proportion of Yes Responses') // Set y-axis label
+            .attr('font-family', 'Playfair Display'); // Set font-family
+
+        // Centered y-axis title and adjusted to avoid overlap with y-axis labels
+        svg.append('text')
+            .attr('transform', 'rotate(-90)')
+            .attr('y', 0 - margin.left + 10) // Adjusted to push further left
+            .attr('x', 0 - (height / 2))
+            .attr('dy', '1em')
+            .style('text-anchor', 'middle')
+            .style('font-family', 'Playfair Display') // Set font-family
+            .text('Proportion of Yes Responses');
+
+        const colors = ["#afc9de", "#8bafc6", "#6baed6", "#4b97c3", "#2f7fae", "#19608a"];
+
+        svg.selectAll('.bar')
+            .data(data)
+            .enter().append('rect')
+            .attr('class', 'bar')
+            .attr('x', d => x(d.company_size))
+            .attr('width', x.bandwidth())
+            .attr('y', d => y(d[yColumn]))
+            .attr('height', d => height - y(d[yColumn]))
+            .style('fill', (d, i) => colors[i]);
+
+        // Title
+        svg.append('text')
+            .attr('x', width / 2)
+            .attr('y', 0 - (margin.top / 2))
+            .attr('text-anchor', 'middle')
+            .style('font-size', '14px')
+            .style('font-family', 'Playfair Display') // Set font-family
+            .text(chartTitle);
+    }
         
         function drawPieChart(data, yColumn, title) {
             const width = 300;
