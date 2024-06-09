@@ -21,11 +21,11 @@ document.addEventListener('DOMContentLoaded', function () {
 "2019",Don't Know,0.304196,0.000000,0.078947,0.236842`;
 
     const csvData2 = `company_size,mentalHealthCoverage,awarenessOfOptions,employeerDiscussion,employeerResources
-"[1-5]",0.14,0.22666666666666666,0.11333333333333333,0.10666666666666667
-"[6-25]",0.2792511700468019,0.21996879875195008,0.0904836193447738,0.0842433697347894
-"[26-100]",0.42712294043092525,0.30925221799746516,0.16603295310519645,0.15082382762991128
-"[100-500]",0.5442708333333334,0.3854166666666667,0.23567708333333334,0.27734375
-"[500-1000]",0.5843621399176955,0.41975308641975306,0.32098765432098764,0.3497942386831276
+"1-5",0.14,0.22666666666666666,0.11333333333333333,0.10666666666666667
+"6-25",0.2792511700468019,0.21996879875195008,0.0904836193447738,0.0842433697347894
+"26-100",0.42712294043092525,0.30925221799746516,0.16603295310519645,0.15082382762991128
+"100-500",0.5442708333333334,0.3854166666666667,0.23567708333333334,0.27734375
+"500-1000",0.5843621399176955,0.41975308641975306,0.32098765432098764,0.3497942386831276
 "More than 1000",0.6689113355780022,0.4489337822671156,0.36475869809203143,0.4792368125701459`;
 
     const base64Data = btoa(csvData);
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             drawChart(data, 'year', 'mentalHealthCoverage');
             drawBarChart(data2, 'mentalHealthCoverage', 'Employer-Provided Mental Health Coverage Across Company Sizes');
-            drawPieChart(parsedData3, 'mentalHealthCoverage', "Out of the people who said that their employer provides mental health benefits as part of healthcare coverage, which percentage of them work at a company that primarily delivers tech products/services?");
+            drawPieChart(parsedData3, 'mentalHealthCoverage', 'Distribution of Company Type from Responses');
             updateSubtitle('mentalHealthCoverage');
 
             document.getElementById('update-chart').addEventListener('click', () => {
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Draw the pie chart with the filtered data and selected y-axis value
-                drawPieChart(filteredData, selectedY, getChartTitle2(selectedY));
+                drawPieChart(filteredData, selectedY, getChartTitle(selectedY));
             });
         }).catch(error => {
             console.error('Error loading the second CSV data:', error);
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style("background", "rgba(255, 255, 255, 0.7)")
                         .style("padding", "5px")
                         .style("border-radius", "5px")
-                        .html(`Over the past few years it seems like companies have had an increase in mental health benefits provided in employees health care coverage. This is also apparent in the other lines we can see that typically there is decrease over time especially in the "no" line.`);
+                        .html(`Over the past few years, companies have had an increase in the mental health benefits provided as part of their employees’ health care coverage. This shift is also apparent in the other lines, where we can see that there is typically a decrease over time, especially prevalent in the line corresponding to the ”no" response.`);
     
                     // Define arrow marker
                     svg.append("defs").append("marker")
@@ -532,7 +532,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
         });
     
         svg.append("text")
@@ -559,7 +558,7 @@ document.addEventListener('DOMContentLoaded', function () {
         d3.select('#bar-chart').selectAll('*').remove();
 
         const margin = { top: 20, right: 30, bottom: 60, left: 80 }; // Increased left margin to provide more space
-        const width = 600 - margin.left - margin.right;
+        const width = 500 - margin.left - margin.right;
         const height = 300 - margin.top - margin.bottom;
 
         const svg = d3.select('#bar-chart').append('svg')
@@ -585,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .selectAll('text')
             .style('text-anchor', 'end')
             .attr('dx', '-.8em')
-            .attr('dy', '.8em')
+            .attr('dy', '.15em')
             .attr('transform', 'rotate(-45)')
             .attr('font-family', 'Playfair Display'); // Set font-family
 
@@ -638,103 +637,99 @@ document.addEventListener('DOMContentLoaded', function () {
             .style('font-family', 'Playfair Display') // Set font-family
             .text(chartTitle);
     }
-
-    function drawPieChart(data, yColumn, title) {
-        const width = 300;
-        const height = 300;
-        const radius = Math.min(width, height) / 2;
-        const margin = { top: 110, right: 50, bottom: 30, left: 50 }; // Increased top margin
+        function drawPieChart(data, yColumn) {
+            const width = 300;
+            const height = 300;
+            const radius = Math.min(width, height) / 2;
+            const margin = { top: 50, right: 20, bottom: 20, left: 20 }; // Increased top margin
+        
+            const colorScale = d3.scaleOrdinal()
+                .domain(data.map(d => d.istechcomp))
+                .range(['#DDA0DD', '#87CEEB']);
+        
+            // Clear previous chart if exists
+            d3.select('#pie-chart').selectAll('*').remove();
+        
+            // Create SVG element
+            const svg = d3.select('#pie-chart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${(width + margin.left + margin.right) / 2},${(height + margin.top + margin.bottom) / 2})`);
+        
+            // Get title using getChartTitle2
+            const title = getChartTitle2(yColumn);
+        
+            // Function to split the title into two lines
+            const splitTitle = (title) => {
+                const words = title.split(' ');
+                if (words.length <= 1) return [title, '']; // If the title is a single word, return it as the first line
+        
+                const midpoint = Math.floor(words.length / 2);
+                let bestSplitPoint = midpoint;
+        
+                // Find the nearest space to the midpoint to split the title
+                for (let i = midpoint; i < words.length; i++) {
+                    if (words[i].length === 0 || words[i][words[i].length - 1] === ',' || words[i][words[i].length - 1] === '.') {
+                        bestSplitPoint = i;
+                        break;
+                    }
+                }
+        
+                let line1 = words.slice(0, bestSplitPoint).join(' ');
+                let line2 = words.slice(bestSplitPoint).join(' ');
+        
+                return [line1, line2];
+            };
+        
+            const [line1, line2] = splitTitle(title);
+        
+            // Append title to the SVG
+            svg.append('text')
+                .attr('x', 0)
+                .attr('y', -height / 2 - margin.top / 2)
+                .attr('text-anchor', 'middle')
+                .text(line1)
+                .style('font-size', '16px')
+                .style('font-weight', 'bold');
+        
+            svg.append('text')
+                .attr('x', 0)
+                .attr('y', -height / 2 - margin.top / 2 + 20) // Adjust y position for the second line
+                .attr('text-anchor', 'middle')
+                .text(line2)
+                .style('font-size', '16px')
+                .style('font-weight', 'bold');
+        
+            const arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
+        
+            const pie = d3.pie()
+                .value(d => d[yColumn]);
+        
+            const g = svg.selectAll('.arc')
+                .data(pie(data))
+                .enter().append('g')
+                .attr('class', 'arc');
+        
+            g.append('path')
+                .attr('d', arc)
+                .style('fill', d => colorScale(d.data.istechcomp))
+                .append('title')
+                .text(d => d.data.istechcomp);
+        
+            g.append('text')
+                .attr('transform', d => `translate(${arc.centroid(d)[0]}, ${arc.centroid(d)[1]})`)
+                .attr('dy', '.35em')
+                .text(d => d.data.istechcomp)
+                .style('text-anchor', 'middle')
+                .style('fill', 'white') // Ensure the text is visible by setting the fill color to white
+                .style('font-size', '10px'); // Adjust font size as needed
+        }
     
-        const colorScale = d3.scaleOrdinal()
-            .domain(data.map(d => d.istechcomp))
-            .range(['#DDA0DD', '#87CEEB']);
-    
-        // Clear previous chart if exists
-        d3.select('#pie-chart').selectAll('*').remove();
-    
-        // Create SVG element
-        const svg = d3.select('#pie-chart')
-            .append('svg')
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform', `translate(${(width + margin.left + margin.right) / 2},${(height + margin.top + margin.bottom) / 2})`);
-    
-        // Split title into four lines
-        const splitTitle = (title) => {
-            const words = title.split(' ');
-            const partLength = Math.ceil(words.length / 4);
-    
-            let line1 = words.slice(0, partLength).join(' ');
-            let line2 = words.slice(partLength, partLength * 2).join(' ');
-            let line3 = words.slice(partLength * 2, partLength * 3).join(' ');
-            let line4 = words.slice(partLength * 3).join(' ');
-    
-            return [line1, line2, line3, line4];
-        };
-    
-        const [line1, line2, line3, line4] = splitTitle(title);
-    
-        // Append title to the SVG
-        svg.append('text')
-            .attr('x', 0)
-            .attr('y', - height / 2 - margin.top / 2) // Position for the first line
-            .attr('text-anchor', 'middle')
-            .text(line1)
-            .style('font-size', '13px')
-            .style('font-weight', 'bold');
-    
-        svg.append('text')
-            .attr('x', 0)
-            .attr('y', - height / 2 - margin.top / 2 + 15) // Position for the second line
-            .attr('text-anchor', 'middle')
-            .text(line2)
-            .style('font-size', '13px')
-            .style('font-weight', 'bold');
-    
-        svg.append('text')
-            .attr('x', 0)
-            .attr('y', - height / 2 - margin.top / 2 + 30) // Position for the third line
-            .attr('text-anchor', 'middle')
-            .text(line3)
-            .style('font-size', '13px')
-            .style('font-weight', 'bold');
-    
-        svg.append('text')
-            .attr('x', 0)
-            .attr('y', - height / 2 - margin.top / 2 + 45) // Position for the fourth line
-            .attr('text-anchor', 'middle')
-            .text(line4)
-            .style('font-size', '13px')
-            .style('font-weight', 'bold');
-    
-        const arc = d3.arc()
-            .innerRadius(0)
-            .outerRadius(radius);
-    
-        const pie = d3.pie()
-            .value(d => d[yColumn]);
-    
-        const g = svg.selectAll('.arc')
-            .data(pie(data))
-            .enter().append('g')
-            .attr('class', 'arc');
-    
-        g.append('path')
-            .attr('d', arc)
-            .style('fill', d => colorScale(d.data.istechcomp))
-            .append('title')
-            .text(d => d.data.istechcomp);
-    
-        g.append('text')
-            .attr('transform', d => `translate(${arc.centroid(d)[0]}, ${arc.centroid(d)[1]})`)
-            .attr('dy', '.35em')
-            .text(d => d.data.istechcomp)
-            .style('text-anchor', 'middle')
-            .style('fill', 'white') // Ensure the text is visible by setting the fill color to white
-            .style('font-size', '10px'); // Adjust font size as needed
-            }
-    
+        
     });
     
 
