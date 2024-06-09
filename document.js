@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style("background", "rgba(255, 255, 255, 0.7)")
                         .style("padding", "5px")
                         .style("border-radius", "5px")
-                        .html(`Over the past few years it seems like companies have had an increase in mental health benefits provided in employees health care coverage. This is also apparent in the other lines we can see that typically there is decrease over time especially in the "no" line.`);
+                        .html(`Over the past few years, companies have had an increase in the mental health benefits provided as part of their employees’ health care coverage. This shift is also apparent in the other lines, where we can see that there is typically a decrease over time, especially prevalent in the line corresponding to the ”no" response.`);
     
                     // Define arrow marker
                     svg.append("defs").append("marker")
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style("background", "rgba(255, 255, 255, 0.7)")
                         .style("padding", "5px")
                         .style("border-radius", "5px")
-                        .html(`In 2017, there was a significant drop in awareness of mental health coverage options among employees. This suggests that employees are becoming more aware of whether or not they know the mental health care options provided in their health care plan.`)
+                        .html(`In 2017, there was a significant drop in “Don’t Know” responses regarding awareness of mental health coverage options among employees. This suggests that employees are becoming more aware of whether or not they know the mental health care options provided in their health care plan.`)
                     // Define arrow marker if not already defined
                     svg.append("defs").append("marker")
                         .attr("id", "arrow")
@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
                     const textX = xPos - 50;
                     const textY = yPos - 140;
-                    const annotationText = "Here we see an increase in employeers campaigning about mental health. This might indicate that tech companies are taking mental health into account more now than in the past.";
+                    const annotationText = "Here we see an increase in the existence of employeers’ discussions about mental health. This indicates that companies in the tech industsry are taking mental health into account more now than in the past.";
             
                     // Add a foreignObject for text wrapping
                     svg.append("foreignObject")
@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("marker-end", "url(#arrow)");
 
             // Annotation text for the arrow
-            const annotationText = "Over time, the don't know line steadily decreases. This suggest that that these educational resources being offered might be effective informing people to at least know whether their employer offers these resources.  This idea is supported with the yes line is steadily increasing and the no line is steadily decreasing over time.";
+            const annotationText = "The “Don't Know” line steadily decreasing over time suggests that these mental health educational resources being offered might be effective in informing people to at least know whether their employer offers these resources. This idea is supported by the steadily increasing “Yes” line and the steadily decreasing “No” line over time.";
             const textX = xPos - 50; // Adjust position
             const textY = yPos + 20; // Adjust position
 
