@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("x", xPos - 120) // Adjusted to position annotation
                         .attr("y", yPos + 55)  // Adjusted to position annotation below the arrow
                         .attr("width", 250)     // Adjust the width as needed
-                        .attr("height", 100)     // Adjust the height as needed
+                        .attr("height", 150)     // Adjust the height as needed
                         .append("xhtml:div")
                         .style("font", "12px 'Arial'")
                         .style("color", "black")
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("x", xPos + 30) // Adjusted to position annotation
                         .attr("y", yPos - 120)  // Adjusted to position annotation above the arrow
                         .attr("width", 250)     // Adjust the width as needed
-                        .attr("height", 130)    // Adjust the height as needed
+                        .attr("height", 150)    // Adjust the height as needed
                         .append("xhtml:div")
                         .style("font", "12px 'Arial'")
                         .style("color", "black")
@@ -472,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("x", textX)
                         .attr("y", textY)
                         .attr("width", 250)     // Adjust the width as needed
-                        .attr("height", 130) // Adjust height as needed
+                        .attr("height", 150) // Adjust height as needed
                         .append("xhtml:div")
                         .style("font-size", "12px")
                         .style("background", "rgba(255, 255, 255, 0.7)")
@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("x", textX)
                 .attr("y", textY)
                 .attr("width", 200) // Adjust width
-                .attr("height", 160) // Adjust height
+                .attr("height", 180) // Adjust height
                 .append("xhtml:div")
                 .style("font-size", "12px")
                 .style("background", "rgba(255, 255, 255, 0.7)")
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
         d3.select('#bar-chart').selectAll('*').remove();
 
         const margin = { top: 20, right: 30, bottom: 60, left: 80 }; // Increased left margin to provide more space
-        const width = 600 - margin.left - margin.right;
+        const width = 700 - margin.left - margin.right;
         const height = 300 - margin.top - margin.bottom;
 
         const svg = d3.select('#bar-chart').append('svg')
@@ -643,7 +643,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const width = 300;
         const height = 300;
         const radius = Math.min(width, height) / 2;
-        const margin = { top: 110, right: 50, bottom: 30, left: 50 }; // Increased top margin
+        const margin = { top: 110, right: 55, bottom: 30, left: 55 }; // Increased top margin
     
         const colorScale = d3.scaleOrdinal()
             .domain(data.map(d => d.istechcomp))
