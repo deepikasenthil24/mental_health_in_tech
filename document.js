@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
                     const textX = xPos - 50;
                     const textY = yPos - 140;
-                    const annotationText = "Here we see an increase in the existence of employeers’ discussions about mental health. This indicates that companies in the tech industsry are taking mental health into account more now than in the past.";
+                    const annotationText = "We see an increase in the existence of employeers’ discussions about mental health. This indicates that companies in the tech industry are taking mental health into account more now than in the past.";
             
                     // Add a foreignObject for text wrapping
                     svg.append("foreignObject")
