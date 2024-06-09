@@ -463,15 +463,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("stroke-width", 2)
                         .attr("marker-end", "url(#arrow)");
             
-                    const textX = xPos - 50;
-                    const textY = yPos - 140;
+                    const textX = xPos - 40;
+                    const textY = yPos - 148;
                     const annotationText = "We see an increase in the existence of employeers’ discussions about mental health. This indicates that companies in the tech industry are taking mental health into account more now than in the past.";
             
                     // Add a foreignObject for text wrapping
                     svg.append("foreignObject")
                         .attr("x", textX)
                         .attr("y", textY)
-                        .attr("width", 250)     // Adjust the width as needed
+                        .attr("width", 230)     // Adjust the width as needed
                         .attr("height", 150) // Adjust height as needed
                         .append("xhtml:div")
                         .style("font-size", "12px")
